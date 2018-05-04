@@ -1,27 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using DC.POC.JobScheduler.Data.Enums;
-using DC.POC.JobScheduler.Data.Repository;
-using DC.POC.WebApi.Models;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+using ESFA.DC.JobQueueManager.Interfaces;
+using ESFA.DC.JobQueueManager.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DC.POC.WebApi.Controllers
+namespace ESFA.DC.Job.WebApi.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Job")]
+    [Route("api/job")]
     public class JobController : Controller
     {
-        private readonly IJobSchedularRepository _jobSchedularRepository;
+        private readonly IJobQueueManager _jobQueueManager;
 
-        public JobController(IJobSchedularRepository jobSchedularRepository)
+        public JobController(IJobQueueManager jobQueueManager)
         {
-            _jobSchedularRepository = jobSchedularRepository;
+            _jobQueueManager = jobQueueManager;
         }
 
         // GET: api/Job
@@ -30,52 +23,38 @@ namespace DC.POC.WebApi.Controllers
         {
             var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
 
-            var jobsList = _jobSchedularRepository.GetAllJobs().Select(x =>
-                new Job()
-                {
-                    FileName = x.FileName,
-                    StorageReference = x.StorageReference,
-                    Ukprn = x.Ukprn.HasValue ? x.Ukprn.Value : 0,
-                    DateTimeSubmittedUtc = TimeZoneInfo.ConvertTime(x.DateTimeSubmittedUtc, TimeZoneInfo.Local, britishZone).ToString("MM/dd/yyyy hh:mm:ss "),
-                    JobId = x.JobId,
-                    Priority = x.Priority,
-                    DateTimeUpdatedUtc = x.DateTimeUpdatedUtc.HasValue ? TimeZoneInfo.ConvertTime(x.DateTimeUpdatedUtc.Value, TimeZoneInfo.Local, britishZone).ToString("MM/dd/yyyy hh:mm:ss") : string.Empty,
-                    JobType = x.JobType,
-                    Status = x.Status,
-                    RowVersion = System.Convert.ToBase64String(x.RowVersion)
-                }).OrderByDescending(x =>
+            var jobsList = _jobQueueManager.GetAllJobs().ToList();
+            jobsList.ForEach(x =>
             {
-                if (x.Status == (int)EnumJobStatus.Completed)
+                x.DateTimeSubmittedUtc =
+                    TimeZoneInfo.ConvertTime(x.DateTimeSubmittedUtc, TimeZoneInfo.Local, britishZone);
+                x.DateTimeUpdatedUtc = TimeZoneInfo.ConvertTime(x.DateTimeUpdatedUtc.GetValueOrDefault(), TimeZoneInfo.Local, britishZone);
+            });
+
+            jobsList = jobsList.OrderByDescending(x =>
+            {
+                switch (x.Status)
                 {
-                    return 10;
+                    case JobStatus.Completed:
+                        return 10;
+                    case JobStatus.Failed:
+                        return 20;
+                    case JobStatus.FailedRetry:
+                        return 30;
+                    case JobStatus.Paused:
+                        return 40;
+                    case JobStatus.MovedForProcessing:
+                    case JobStatus.Processing:
+                        return 50;
+                    default:
+                        return 60;
                 }
-                if (x.Status == (int)EnumJobStatus.Failed)
-                {
-                    return 20;
-                }
-                else if (x.Status == (int)EnumJobStatus.FailedRetry)
-                {
-                    return 30;
-                }
-                else if (x.Status == (int)EnumJobStatus.FailedRetry)
-                {
-                    return 40;
-                }
-                else if (x.Status == (int)EnumJobStatus.MovedForProcessing || x.Status == (int)EnumJobStatus.Processing)
-                {
-                    return 50;
-                }
-                else
-                {
-                    return 60;
-                }
-            }).ThenByDescending(x => x.Priority).ThenBy(x => x.JobId);
+            }).ThenByDescending(x => x.Priority).ThenBy(x => x.JobId).ToList();
             return Ok(jobsList.ToList());
         }
 
-        // POST: api/Job
         [HttpPost]
-        public ActionResult Post([FromBody]Job job)
+        public ActionResult Post([FromBody]JobQueueManager.Models.Job job)
         {
             if (job == null)
             {
@@ -84,10 +63,9 @@ namespace DC.POC.WebApi.Controllers
 
             try
             {
-                var jobEntity = Convert(job);
-                if (jobEntity.JobId > 0)
+                if (job.JobId > 0)
                 {
-                   var result = _jobSchedularRepository.UpdateJob(jobEntity);
+                   var result = _jobQueueManager.UpdateJob(job);
                     if (result)
                     {
                         return Ok();
@@ -99,7 +77,7 @@ namespace DC.POC.WebApi.Controllers
                 }
                 else
                 {
-                   job.JobId = _jobSchedularRepository.AddJob(jobEntity);
+                   job.JobId = _jobQueueManager.AddJob(job);
                     if (job.JobId > 0)
                     {
                         return Ok(job.JobId);
@@ -110,14 +88,12 @@ namespace DC.POC.WebApi.Controllers
                     }
                 }
             }
-
             catch (Exception ex)
             {
                 return BadRequest();
             }
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
@@ -128,39 +104,13 @@ namespace DC.POC.WebApi.Controllers
 
             try
             {
-                var job = _jobSchedularRepository.GetJobById(id);
-                if (job == null)
-                {
-                    return BadRequest();
-                }
-
-                _jobSchedularRepository.RemoveJobFromQueue(job);
+                _jobQueueManager.RemoveJobFromQueue(id);
                 return Ok();
             }
-
             catch (Exception ex)
             {
                 return BadRequest();
             }
-        }
-
-        private JobScheduler.Data.Entities.Job Convert(Job job)
-        {
-            DateTime.TryParse(job.DateTimeSubmittedUtc, out var dateTimeSubmitted);
-
-            var jobEntity = new JobScheduler.Data.Entities.Job()
-            {
-                JobId = job.JobId,
-                Status = job.JobId == 0 ? (short)EnumJobStatus.Ready : job.Status,
-                Priority = job.Priority == 0 ? (short)1 : job.Priority,
-                FileName = job.FileName,
-                Ukprn = job.Ukprn,
-                JobType = job.JobType > 0 ? job.JobType : (int)EnumJobType.IlrSubmission,
-                RowVersion = job.JobId > 0 ? System.Convert.FromBase64String(job.RowVersion) : null,
-                StorageReference = job.StorageReference,
-                DateTimeSubmittedUtc = dateTimeSubmitted
-            };
-            return jobEntity;
         }
     }
 }

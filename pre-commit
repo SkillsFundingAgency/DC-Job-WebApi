@@ -1,0 +1,2 @@
+#!/bin/sh
+powershell -noprofile -executionpolicy unrestricted -file src/PreCommit.ps1
