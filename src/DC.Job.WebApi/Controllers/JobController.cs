@@ -26,9 +26,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
             var jobsList = _jobQueueManager.GetAllJobs().ToList();
             jobsList.ForEach(x =>
             {
-                x.DateTimeSubmittedUtc =
-                    TimeZoneInfo.ConvertTime(x.DateTimeSubmittedUtc, TimeZoneInfo.Local, britishZone);
-                x.DateTimeUpdatedUtc = TimeZoneInfo.ConvertTime(x.DateTimeUpdatedUtc.GetValueOrDefault(), TimeZoneInfo.Local, britishZone);
+                x.DateTimeSubmittedUtc = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(x.DateTimeSubmittedUtc, DateTimeKind.Unspecified), TimeZoneInfo.Local, britishZone);
+                x.DateTimeUpdatedUtc = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(x.DateTimeUpdatedUtc.GetValueOrDefault(), DateTimeKind.Unspecified), TimeZoneInfo.Local, britishZone);
             });
 
             jobsList = jobsList.OrderByDescending(x =>
