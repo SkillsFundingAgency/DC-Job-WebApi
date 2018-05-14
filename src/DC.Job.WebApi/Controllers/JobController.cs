@@ -64,14 +64,22 @@ namespace ESFA.DC.Job.WebApi.Controllers
             {
                 if (job.JobId > 0)
                 {
-                   var result = _jobQueueManager.UpdateJob(job);
-                    if (result)
+                    if (job.Status == JobStatus.Ready || job.Status == JobStatus.Paused ||
+                        job.Status == JobStatus.FailedRetry)
                     {
-                        return Ok();
+                        var result = _jobQueueManager.UpdateJob(job);
+                        if (result)
+                        {
+                            return Ok();
+                        }
+                        else
+                        {
+                            return BadRequest();
+                        }
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest("Job with status of Ready,Paused or FailedRetry can only be updated.");
                     }
                 }
                 else

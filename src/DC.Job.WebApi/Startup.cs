@@ -47,6 +47,11 @@ namespace ESFA.DC.Job.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+
             app.UseMvc();
         }
 

@@ -22,8 +22,10 @@
     <PackageReference Include="autofac" Version="4.8.0" />
     <PackageReference Include="Autofac.Configuration" Version="4.0.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
-    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.0-beta0001" />
+    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.3-beta0001" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.sqlserver" Version="2.0.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
   </ItemGroup>
 
