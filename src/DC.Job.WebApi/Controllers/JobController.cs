@@ -60,6 +60,16 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
+            if (Enum.IsDefined(typeof(JobStatus), job.Status))
+            {
+                return BadRequest("Status is not a valid value");
+            }
+
+            if (Enum.IsDefined(typeof(JobType), job.JobType))
+            {
+                return BadRequest("Job type is not a valid value");
+            }
+
             try
             {
                 if (job.JobId > 0)
