@@ -1,6 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using Autofac;
 using ESFA.DC.Job.WebApi.Settings;
 using ESFA.DC.JobQueueManager.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ESFA.DC.Job.WebApi.Ioc
 {
@@ -9,18 +12,18 @@ namespace ESFA.DC.Job.WebApi.Ioc
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<JobQueueManager.JobQueueManager>().As<IJobQueueManager>().InstancePerLifetimeScope();
-            //builder.RegisterType<JobQueueManagerSettings>().As<IJobQueueManagerSettings>().SingleInstance();
+            builder.Register(context =>
+                {
+                    var queueManagerSettings = context.Resolve<JobQueueManagerSettings>();
+                    var optionsBuilder = new DbContextOptionsBuilder();
+                    optionsBuilder.UseSqlServer(
+                        queueManagerSettings.ConnectionString,
+                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
 
-            //builder.RegisterType<SqlServerKeyValuePersistenceService>().As<IKeyValuePersistenceService>().InstancePerLifetimeScope();
-            //builder.RegisterType<JsonSerializationService>().As<ISerializationService>().InstancePerLifetimeScope();
-
-            //builder.Register(context =>
-            //{
-            //    var logger = ESFA.DC.Logging.LoggerManager.CreateDefaultLogger();
-            //    return logger;
-            //})
-            //    .As<ILogger>()
-            //    .InstancePerLifetimeScope();
+                    return optionsBuilder.Options;
+                })
+                .As<DbContextOptions>()
+                .SingleInstance();
         }
     }
 }

@@ -60,18 +60,36 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
+            if (Enum.IsDefined(typeof(JobStatus), job.Status))
+            {
+                return BadRequest("Status is not a valid value");
+            }
+
+            if (Enum.IsDefined(typeof(JobType), job.JobType))
+            {
+                return BadRequest("Job type is not a valid value");
+            }
+
             try
             {
                 if (job.JobId > 0)
                 {
-                   var result = _jobQueueManager.UpdateJob(job);
-                    if (result)
+                    if (job.Status == JobStatus.Ready || job.Status == JobStatus.Paused ||
+                        job.Status == JobStatus.FailedRetry)
                     {
-                        return Ok();
+                        var result = _jobQueueManager.UpdateJob(job);
+                        if (result)
+                        {
+                            return Ok();
+                        }
+                        else
+                        {
+                            return BadRequest();
+                        }
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest("Job with status of Ready,Paused or FailedRetry can only be updated.");
                     }
                 }
                 else
