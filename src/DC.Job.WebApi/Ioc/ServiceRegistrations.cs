@@ -4,6 +4,7 @@ using Autofac;
 using ESFA.DC.Job.WebApi.Settings;
 using ESFA.DC.JobQueueManager.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using ValidationErrorStub;
 
 namespace ESFA.DC.Job.WebApi.Ioc
 {
@@ -12,6 +13,8 @@ namespace ESFA.DC.Job.WebApi.Ioc
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<JobQueueManager.JobQueueManager>().As<IJobQueueManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ValidationErrorsReportService>().As<IValidationErrorsReportService>().InstancePerLifetimeScope();
+
             builder.Register(context =>
                 {
                     var queueManagerSettings = context.Resolve<JobQueueManagerSettings>();
