@@ -52,6 +52,19 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList.ToList());
         }
 
+        // GET: api/Job
+        [HttpGet("{jobId}")]
+        public IActionResult Get(long jobId)
+        {
+            if (jobId == 0)
+            {
+                return BadRequest();
+            }
+
+            var job = _jobQueueManager.GetJobById(jobId);
+            return Ok(job);
+        }
+
         [HttpPost]
         public ActionResult Post([FromBody]JobQueueManager.Models.Job job)
         {
@@ -60,12 +73,12 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
-            if (Enum.IsDefined(typeof(JobStatus), job.Status))
+            if (!Enum.IsDefined(typeof(JobStatus), job.Status))
             {
                 return BadRequest("Status is not a valid value");
             }
 
-            if (Enum.IsDefined(typeof(JobType), job.JobType))
+            if (!Enum.IsDefined(typeof(JobType), job.JobType))
             {
                 return BadRequest("Job type is not a valid value");
             }
