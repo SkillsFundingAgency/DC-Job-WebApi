@@ -19,10 +19,10 @@ namespace ESFA.DC.Job.WebApi.Controllers
             _validationErrorsReportService = validationErrorsReportService;
         }
 
-        [HttpGet("{jobId}")]
-        public async Task<IEnumerable<ValidationError>> Get(long jobId)
+        [HttpGet("{ukprn}")]
+        public async Task<IEnumerable<ValidationError>> Get(long ukprn)
         {
-            return await _validationErrorsReportService.GetValidationErrorsAsync(jobId);
+            return await _validationErrorsReportService.GetValidationErrorsAsync(ukprn);
         }
     }
 }

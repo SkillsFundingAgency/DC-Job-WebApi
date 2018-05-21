@@ -7,7 +7,7 @@ namespace ValidationErrorStub
 {
     public class ValidationErrorsReportService : IValidationErrorsReportService
     {
-        public async Task<IEnumerable<ValidationError>> GetValidationErrorsAsync(long jobId)
+        public async Task<IEnumerable<ValidationError>> GetValidationErrorsAsync(long ukprn)
         {
             return new List<ValidationError>()
             {

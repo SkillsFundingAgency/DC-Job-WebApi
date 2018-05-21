@@ -6,6 +6,6 @@ namespace ValidationErrorStub
 {
     public interface IValidationErrorsReportService
     {
-        Task<IEnumerable<ValidationError>> GetValidationErrorsAsync(long jobId);
+        Task<IEnumerable<ValidationError>> GetValidationErrorsAsync(long ukprn);
     }
 }
