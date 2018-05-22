@@ -12,6 +12,9 @@ namespace ESFA.DC.Job.WebApi.Ioc
         {
             builder.Register(c => configuration.GetConfigSection<JobQueueManagerSettings>())
                 .As<JobQueueManagerSettings>().SingleInstance();
+
+            builder.Register(c => configuration.GetConfigSection<ConnectionStrings>())
+                .As<ConnectionStrings>().SingleInstance();
         }
     }
 }

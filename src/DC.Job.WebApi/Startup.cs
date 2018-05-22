@@ -62,6 +62,7 @@ namespace ESFA.DC.Job.WebApi
             containerBuilder.SetupConfigurations(Configuration);
 
             containerBuilder.RegisterModule<ServiceRegistrations>();
+            containerBuilder.RegisterModule<LoggerRegistrations>();
 
             containerBuilder.Populate(services);
             var applicationContainer = containerBuilder.Build();
