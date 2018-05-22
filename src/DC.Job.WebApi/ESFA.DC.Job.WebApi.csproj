@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>ESFA.DC.Job.WebApi</AssemblyName>
     <RootNamespace>ESFA.DC.Job.WebApi</RootNamespace>
+    <ApplicationInsightsResourceId>/subscriptions/12f72527-6622-45d3-90a4-0a5d3644c45c/resourcegroups/DC-CI-AppSrvEnv-WEU/providers/microsoft.insights/components/DC-CI-WebTest-WEU</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/12f72527-6622-45d3-90a4-0a5d3644c45c/resourcegroups/DC-CI-AppSrvEnv-WEU/providers/microsoft.insights/components/DC-CI-WebTest-WEU</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,6 +26,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.5-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.1-beta0001" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.sqlserver" Version="2.0.3" />
@@ -43,6 +46,10 @@
     <Content Update="appsettings.salman.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
