@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DC.Job.WebApi.Reports;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ValidationErrorStub;
 
 namespace ESFA.DC.Job.WebApi.Controllers
 {
@@ -13,21 +13,21 @@ namespace ESFA.DC.Job.WebApi.Controllers
     [Route("api/[controller]")]
     public class ValidationErrorsController : ControllerBase
     {
-        private readonly IValidationErrorsReportService _validationErrorsReportService;
+        private readonly IValidationErrorsService _validationErrorsService;
         private readonly ILogger _logger;
 
-        public ValidationErrorsController(IValidationErrorsReportService validationErrorsReportService, ILogger logger)
+        public ValidationErrorsController(IValidationErrorsService validationErrorsService, ILogger logger)
         {
-            _validationErrorsReportService = validationErrorsReportService;
+            _validationErrorsService = validationErrorsService;
             _logger = logger;
         }
 
-        [HttpGet("{ukprn}")]
-        public async Task<IEnumerable<ValidationError>> Get(long ukprn)
+        [HttpGet("{ukprn}/{jobId}")]
+        public async Task<IEnumerable<ValidationError>> Get(long ukprn, long jobId)
         {
-            _logger.LogInfo($"Get request recieved for validation errors ukprn : {ukprn}");
+            _logger.LogInfo($"Get request recieved for validation errors ukprn : {ukprn}, Job id: {jobId}");
 
-            return await _validationErrorsReportService.GetValidationErrorsAsync(ukprn);
+            return await _validationErrorsService.GetValidationErrorsAsync(ukprn, jobId);
         }
     }
 }

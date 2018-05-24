@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ValidationErrorStub
+﻿namespace DC.Job.WebApi.Reports
 {
     public class ValidationError
     {

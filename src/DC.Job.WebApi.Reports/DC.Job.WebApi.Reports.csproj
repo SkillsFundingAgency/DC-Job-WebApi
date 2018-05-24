@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESFA.DC.IO.Interfaces" Version="0.1.2-beta0001" />
+    <PackageReference Include="ESFA.DC.KeyGenerator.Interface" Version="0.1.2-beta0001" />
+    <PackageReference Include="ESFA.DC.Serialization.Interfaces" Version="0.1.2-beta0001" />
+  </ItemGroup>
+
+</Project>
