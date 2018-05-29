@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DC.Job.WebApi.Reports;
+using ESFA.DC.ILR.ValidationErrorReport.Model;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpGet("{ukprn}/{jobId}")]
-        public async Task<IEnumerable<ValidationError>> Get(long ukprn, long jobId)
+        public async Task<IEnumerable<ReportValidationError>> Get(long ukprn, long jobId)
         {
             _logger.LogInfo($"Get request recieved for validation errors ukprn : {ukprn}, Job id: {jobId}");
 
