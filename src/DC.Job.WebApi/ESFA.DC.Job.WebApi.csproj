@@ -24,33 +24,23 @@
     <PackageReference Include="autofac" Version="4.8.0" />
     <PackageReference Include="Autofac.Configuration" Version="4.0.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
-    <PackageReference Include="ESFA.DC.ILR.ValidationErrorReport.Model" Version="0.1.0-beta0001" />
+    <PackageReference Include="ESFA.DC.ILR.ValidationErrors" Version="0.1.4-beta0001" />
     <PackageReference Include="ESFA.DC.IO.AzureStorage" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.KeyGenerator" Version="0.1.2-beta0001" />
+    <PackageReference Include="ESFA.DC.KeyGenerator.Interface" Version="0.1.3-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.1-beta0001" />
-    <PackageReference Include="ESFA.DC.Serialization.Json" Version="0.1.2-beta0001" />
+    <PackageReference Include="ESFA.DC.Serialization.Json" Version="0.1.4-beta0001" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.sqlserver" Version="2.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta007" />
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DC.Job.WebApi.Reports\DC.Job.WebApi.Reports.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ESFA.DC.ILR.ValidationService.IO.Model">
-      <HintPath>..\..\..\DC-ILR-1819-ValidationService\src\ESFA.DC.ILR.ValidationService.IO.Model\bin\Debug\netstandard2.0\ESFA.DC.ILR.ValidationService.IO.Model.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

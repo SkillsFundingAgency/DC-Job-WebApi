@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using DC.Job.WebApi.Reports;
+using ESFA.DC.ILR.ValidationErrors;
+using ESFA.DC.ILR.ValidationErrors.Interface;
 using ESFA.DC.IO.AzureStorage;
 using ESFA.DC.IO.Interfaces;
 using ESFA.DC.Job.WebApi.Settings;
