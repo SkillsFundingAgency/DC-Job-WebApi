@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.JobQueueManager.Models.Enums;
@@ -13,6 +14,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
     {
         private readonly IJobQueueManager _jobQueueManager;
         private readonly ILogger _logger;
+        private readonly TimeZoneInfo _britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
 
         public JobController(IJobQueueManager jobQueueManager, ILogger logger)
         {
@@ -28,16 +30,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             try
             {
-                var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-
                 var jobsList = _jobQueueManager.GetAllJobs().ToList();
-                jobsList.ForEach(x =>
-                {
-                    x.DateTimeSubmittedUtc = TimeZoneInfo.ConvertTime(
-                        DateTime.SpecifyKind(x.DateTimeSubmittedUtc, DateTimeKind.Unspecified), TimeZoneInfo.Local, britishZone);
-                    x.DateTimeUpdatedUtc = TimeZoneInfo.ConvertTime(
-                        DateTime.SpecifyKind(x.DateTimeUpdatedUtc.GetValueOrDefault(), DateTimeKind.Unspecified), TimeZoneInfo.Local, britishZone);
-                });
+                TransformDates(jobsList);
 
                 jobsList = jobsList.OrderByDescending(x =>
                 {
@@ -69,21 +63,38 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
         }
 
-        // GET: api/Job
-        [HttpGet("{jobId}")]
-        public IActionResult Get(long jobId)
+        [HttpGet("{ukprn}/{jobId}")]
+        public IActionResult Get(long ukprn, long jobId)
         {
-            _logger.LogInfo($"Request recieved to get the with Id : {jobId}");
+            _logger.LogInfo($"Request recieved to get the with Id : {jobId}, ukprn : {ukprn}");
 
-            if (jobId == 0)
+            if (jobId == 0 || ukprn == 0)
             {
-                _logger.LogWarning($"Request recieved with Job id 0");
+                _logger.LogWarning($"Request recieved with Job id or ukprn 0");
                 return BadRequest();
             }
 
             var job = _jobQueueManager.GetJobById(jobId);
             _logger.LogInfo($"Returning job successfully with job id :{job.JobId}");
             return Ok(job);
+        }
+
+        [HttpGet("{ukprn}")]
+        public IActionResult Get(long ukprn)
+        {
+            _logger.LogInfo($"Request recieved to get the with ukprn : {ukprn}");
+
+            if (ukprn == 0)
+            {
+                _logger.LogWarning($"Request recieved with ukprn 0");
+                return BadRequest();
+            }
+
+            var jobsList = _jobQueueManager.GetJobsByUkprn(ukprn).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
+            TransformDates(jobsList);
+
+            _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
+            return Ok(jobsList);
         }
 
         [HttpPost]
@@ -181,6 +192,17 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
                 return BadRequest();
             }
+        }
+
+        private void TransformDates(List<JobQueueManager.Models.Job> jobsList)
+        {
+            jobsList.ForEach(x =>
+            {
+                x.DateTimeSubmittedUtc = TimeZoneInfo.ConvertTime(
+                    DateTime.SpecifyKind(x.DateTimeSubmittedUtc, DateTimeKind.Unspecified), TimeZoneInfo.Local, _britishZone);
+                x.DateTimeUpdatedUtc = TimeZoneInfo.ConvertTime(
+                    DateTime.SpecifyKind(x.DateTimeUpdatedUtc.GetValueOrDefault(), DateTimeKind.Unspecified), TimeZoneInfo.Local, _britishZone);
+            });
         }
     }
 }
