@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ESFA.DC.DateTime.Provider.Interface;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.JobQueueManager.Models.Enums;
 using ESFA.DC.Logging.Interfaces;
@@ -14,12 +15,13 @@ namespace ESFA.DC.Job.WebApi.Controllers
     {
         private readonly IJobQueueManager _jobQueueManager;
         private readonly ILogger _logger;
-        private readonly TimeZoneInfo _britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public JobController(IJobQueueManager jobQueueManager, ILogger logger)
+        public JobController(IJobQueueManager jobQueueManager, ILogger logger, IDateTimeProvider dateTimeProvider)
         {
             _jobQueueManager = jobQueueManager;
             _logger = logger;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         // GET: api/Job
@@ -198,10 +200,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
         {
             jobsList.ForEach(x =>
             {
-                x.DateTimeSubmittedUtc = TimeZoneInfo.ConvertTime(
-                    DateTime.SpecifyKind(x.DateTimeSubmittedUtc, DateTimeKind.Unspecified), TimeZoneInfo.Local, _britishZone);
-                x.DateTimeUpdatedUtc = TimeZoneInfo.ConvertTime(
-                    DateTime.SpecifyKind(x.DateTimeUpdatedUtc.GetValueOrDefault(), DateTimeKind.Unspecified), TimeZoneInfo.Local, _britishZone);
+                x.DateTimeSubmittedUtc = _dateTimeProvider.ConvertUtcToUk(x.DateTimeSubmittedUtc);
+                x.DateTimeUpdatedUtc = _dateTimeProvider.ConvertUtcToUk(x.DateTimeUpdatedUtc.GetValueOrDefault());
             });
         }
     }
