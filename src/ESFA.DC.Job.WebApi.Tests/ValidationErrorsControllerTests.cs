@@ -27,7 +27,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var serializationService = new Mock<ISerializationService>();
 
             var validationerrors = "1_1_ValidationErrors";
-            keyGenerator.Setup(x => x.GenerateKey(1, 1, TaskKeys.ValidationErrors, "_"))
+            keyGenerator.Setup(x => x.GenerateKey(1, 1, TaskKeys.ValidationErrors))
                 .Returns(validationerrors);
             keyValuePersistenceService.Setup(x => x.ContainsAsync("1_1_1")).Returns(Task.FromResult(false));
 
@@ -46,7 +46,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var serializationService = new Mock<ISerializationService>();
 
             var validationerrors = "1_1_ValidationErrors";
-            keyGenerator.Setup(x => x.GenerateKey(1, 1, TaskKeys.ValidationErrors, "_"))
+            keyGenerator.Setup(x => x.GenerateKey(1, 1, TaskKeys.ValidationErrors))
                 .Returns(validationerrors);
             keyValuePersistenceService.Setup(x => x.ContainsAsync(validationerrors)).Returns(Task.FromResult(true));
 

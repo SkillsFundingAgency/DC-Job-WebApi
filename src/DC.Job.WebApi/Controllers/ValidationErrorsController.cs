@@ -37,7 +37,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             _logger.LogInfo($"Get request recieved for validation errors ukprn : {ukprn}, Job id: {jobId}");
             try
             {
-                var validationErrorsKey = _keyGenerator.GenerateKey(ukprn, jobId, TaskKeys.ValidationErrors, "_");
+                var validationErrorsKey = _keyGenerator.GenerateKey(ukprn, jobId, TaskKeys.ValidationErrors);
                 var exists = await _keyValuePersistenceService.ContainsAsync(validationErrorsKey);
                 if (exists)
                 {

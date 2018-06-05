@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
+using ESFA.DC.DateTime.Provider;
+using ESFA.DC.DateTime.Provider.Interface;
 using ESFA.DC.ILR.ValidationErrors;
 using ESFA.DC.ILR.ValidationErrors.Interface;
 using ESFA.DC.IO.AzureStorage;
@@ -22,6 +24,7 @@ namespace ESFA.DC.Job.WebApi.Ioc
             builder.RegisterType<JsonSerializationService>().As<ISerializationService>().InstancePerLifetimeScope();
             builder.RegisterType<AzureStorageKeyValuePersistenceService>().As<IKeyValuePersistenceService>().InstancePerLifetimeScope();
             builder.RegisterType<KeyGenerator.KeyGenerator>().As<IKeyGenerator>().InstancePerLifetimeScope();
+            builder.RegisterType<DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
 
             builder.Register(context =>
                 {
