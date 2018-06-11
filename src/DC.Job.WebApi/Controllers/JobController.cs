@@ -99,6 +99,44 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
+        [HttpPost("{jobId}/{status}")]
+        public ActionResult Post(long jobId, JobStatus status)
+        {
+            _logger.LogInfo($"Post for job recieved for job : {jobId}, status {status} ");
+            if (jobId == 0)
+            {
+                _logger.LogWarning($"Job Post request received with empty data");
+                return BadRequest();
+            }
+
+            if (!Enum.IsDefined(typeof(JobStatus), status))
+            {
+                _logger.LogWarning($"Job Post request received with bad status {status}");
+                return BadRequest("Status is not a valid value");
+            }
+
+            try
+            {
+                var result = _jobQueueManager.UpdateJobStatus(jobId, status);
+                if (result)
+                {
+                    _logger.LogInfo($"Successfully updated job status for job Id : {jobId}");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning($"Update status failed for job Id : {jobId}");
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Post for job failed for job : {jobId} ", ex);
+
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         public ActionResult Post([FromBody]JobQueueManager.Models.Job job)
         {

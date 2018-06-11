@@ -302,6 +302,33 @@ namespace ESFA.DC.Job.WebApi.Tests
         }
 
         [Fact]
+        public void PostJob_UpdateJobStatus_Failed_ZeroJobIdTest()
+        {
+            var jobqueServiceMock = new Mock<IJobQueueManager>();
+
+            var mockLogger = new Mock<ILogger>();
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+
+            var result = controller.Post(0, JobStatus.Completed);
+            result.Should().BeAssignableTo<BadRequestResult>();
+            ((BadRequestResult)result).StatusCode.Should().Be(400);
+        }
+
+        [Fact]
+        public void PostJob_UpdateJobStatus_Success_Test()
+        {
+            var jobqueServiceMock = new Mock<IJobQueueManager>();
+            jobqueServiceMock.Setup(x => x.UpdateJobStatus(100, JobStatus.Completed)).Returns(true);
+
+            var mockLogger = new Mock<ILogger>();
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+
+            var result = controller.Post(100, JobStatus.Completed);
+            result.Should().BeAssignableTo<OkResult>();
+            ((OkResult)result).StatusCode.Should().Be(200);
+        }
+
+        [Fact]
         public void Delete_ZeroId_Failed_Test()
         {
             var jobqueServiceMock = new Mock<IJobQueueManager>();
