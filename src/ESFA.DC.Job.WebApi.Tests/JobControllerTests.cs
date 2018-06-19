@@ -6,6 +6,8 @@ using ESFA.DC.DateTime.Provider;
 using ESFA.DC.Job.WebApi.Controllers;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.JobQueueManager.Models.Enums;
+using ESFA.DC.JobStatus.Dto;
+using ESFA.DC.JobStatus.Interface;
 using ESFA.DC.Logging.Interfaces;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -40,31 +42,31 @@ namespace ESFA.DC.Job.WebApi.Tests
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 1,
-                    Status = JobStatus.Completed,
+                    Status = JobStatusType.Completed,
                     Priority = 3,
                 },
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 2,
-                    Status = JobStatus.Ready,
+                    Status = JobStatusType.Ready,
                     Priority = 5,
                 },
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 3,
-                    Status = JobStatus.Ready,
+                    Status = JobStatusType.Ready,
                     Priority = 1,
                 },
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 4,
-                    Status = JobStatus.Ready,
+                    Status = JobStatusType.Ready,
                     Priority = 5,
                 },
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 4,
-                    Status = JobStatus.Completed,
+                    Status = JobStatusType.Completed,
                     Priority = 100,
                 },
             };
@@ -115,7 +117,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.GetJobById(2)).Returns(new JobQueueManager.Models.Job()
             {
                 JobId = 2,
-                Status = JobStatus.Ready,
+                Status = JobStatusType.Ready,
                 Priority = 5,
                 Ukprn = 1000,
             });
@@ -126,7 +128,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var outputJob = (JobQueueManager.Models.Job)result.Value;
             outputJob.JobId.Should().Be(2);
-            outputJob.Status.Should().Be(JobStatus.Ready);
+            outputJob.Status.Should().Be(JobStatusType.Ready);
             outputJob.Priority.Should().Be(5);
             outputJob.Ukprn.Should().Be(1000);
         }
@@ -154,14 +156,14 @@ namespace ESFA.DC.Job.WebApi.Tests
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 1,
-                    Status = JobStatus.Completed,
+                    Status = JobStatusType.Completed,
                     Priority = 3,
                     Ukprn = 1000,
                 },
                 new JobQueueManager.Models.Job()
                 {
                     JobId = 2,
-                    Status = JobStatus.Ready,
+                    Status = JobStatusType.Ready,
                     Priority = 5,
                     Ukprn = 1000,
                 },
@@ -185,7 +187,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var mockLogger = new Mock<ILogger>();
             var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
 
-            var result = (BadRequestResult)controller.Post(null);
+            var result = (BadRequestResult)controller.Post((JobQueueManager.Models.Job)null);
             result.StatusCode.Should().Be(400);
         }
 
@@ -194,7 +196,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var job = new JobQueueManager.Models.Job()
             {
-                Status = JobStatus.Ready,
+                Status = JobStatusType.Ready,
                 JobType = JobType.IlrSubmission,
                 Ukprn = 1000,
             };
@@ -214,7 +216,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var job = new JobQueueManager.Models.Job()
             {
-                Status = JobStatus.Ready,
+                Status = JobStatusType.Ready,
                 JobType = JobType.IlrSubmission,
             };
             var jobqueServiceMock = new Mock<IJobQueueManager>();
@@ -245,7 +247,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var job = new JobQueueManager.Models.Job()
             {
-                Status = JobStatus.Ready,
+                Status = JobStatusType.Ready,
             };
             var jobqueServiceMock = new Mock<IJobQueueManager>();
 
@@ -262,7 +264,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var job = new JobQueueManager.Models.Job()
             {
                 JobId = 100,
-                Status = JobStatus.Ready,
+                Status = JobStatusType.Ready,
                 JobType = JobType.IlrSubmission,
                 Ukprn = 1000,
             };
@@ -278,11 +280,11 @@ namespace ESFA.DC.Job.WebApi.Tests
         }
 
         [Theory]
-        [InlineData(JobStatus.MovedForProcessing)]
-        [InlineData(JobStatus.Processing)]
-        [InlineData(JobStatus.Completed)]
-        [InlineData(JobStatus.Failed)]
-        public void PostJob_UpdateJob_InvalidStatus_Failed_Test(JobStatus status)
+        [InlineData(JobStatusType.MovedForProcessing)]
+        [InlineData(JobStatusType.Processing)]
+        [InlineData(JobStatusType.Completed)]
+        [InlineData(JobStatusType.Failed)]
+        public void PostJob_UpdateJob_InvalidStatus_Failed_Test(JobStatusType status)
         {
             var job = new JobQueueManager.Models.Job()
             {
@@ -302,6 +304,19 @@ namespace ESFA.DC.Job.WebApi.Tests
         }
 
         [Fact]
+        public void PostJob_UpdateJobStatus_Failed_NullDtoTest()
+        {
+            var jobqueServiceMock = new Mock<IJobQueueManager>();
+
+            var mockLogger = new Mock<ILogger>();
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+
+            var result = controller.Post((JobStatusDto)null);
+            result.Should().BeAssignableTo<BadRequestResult>();
+            ((BadRequestResult)result).StatusCode.Should().Be(400);
+        }
+
+        [Fact]
         public void PostJob_UpdateJobStatus_Failed_ZeroJobIdTest()
         {
             var jobqueServiceMock = new Mock<IJobQueueManager>();
@@ -309,7 +324,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var mockLogger = new Mock<ILogger>();
             var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
 
-            var result = controller.Post(0, JobStatus.Completed);
+            var result = controller.Post(new JobStatusDto());
             result.Should().BeAssignableTo<BadRequestResult>();
             ((BadRequestResult)result).StatusCode.Should().Be(400);
         }
@@ -318,12 +333,16 @@ namespace ESFA.DC.Job.WebApi.Tests
         public void PostJob_UpdateJobStatus_Success_Test()
         {
             var jobqueServiceMock = new Mock<IJobQueueManager>();
-            jobqueServiceMock.Setup(x => x.UpdateJobStatus(100, JobStatus.Completed)).Returns(true);
+            jobqueServiceMock.Setup(x => x.UpdateJobStatus(100, JobStatusType.Completed)).Returns(true);
 
             var mockLogger = new Mock<ILogger>();
             var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
 
-            var result = controller.Post(100, JobStatus.Completed);
+            var result = controller.Post(new JobStatusDto()
+            {
+                JobStatus = (int)JobStatusType.Completed,
+                JobId = 100,
+            });
             result.Should().BeAssignableTo<OkResult>();
             ((OkResult)result).StatusCode.Should().Be(200);
         }

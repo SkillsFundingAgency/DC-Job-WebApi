@@ -27,7 +27,8 @@
     <PackageReference Include="ESFA.DC.DateTime.Provider" Version="0.1.1-beta0001" />
     <PackageReference Include="ESFA.DC.ILR.ValidationErrors.Interface" Version="0.1.3-beta0001" />
     <PackageReference Include="ESFA.DC.IO.AzureStorage" Version="0.1.8-beta0001" />
-    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.9-beta0001" />
+    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.10-beta0001" />
+    <PackageReference Include="ESFA.DC.JobStatus" Version="0.1.4-beta0001" />
     <PackageReference Include="ESFA.DC.KeyGenerator" Version="0.1.4-beta0001" />
     <PackageReference Include="ESFA.DC.KeyGenerator.Interface" Version="0.1.4-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.1-beta0001" />
