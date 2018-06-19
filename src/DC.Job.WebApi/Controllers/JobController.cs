@@ -101,7 +101,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
-        [HttpPost]
+        [HttpPost("{status}")]
         public ActionResult Post([FromBody]JobStatusDto jobStatusDto)
         {
             if (jobStatusDto == null)
