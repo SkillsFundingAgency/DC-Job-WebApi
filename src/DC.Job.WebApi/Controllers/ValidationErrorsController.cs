@@ -51,7 +51,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 throw;
             }
 
-            return new List<ValidationErrorDto>();
+            return null;
         }
     }
 }

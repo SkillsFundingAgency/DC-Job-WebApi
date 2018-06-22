@@ -33,8 +33,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var controller = new ValidationErrorsController(keyValuePersistenceService.Object, logger.Object, keyGenerator.Object, serializationService.Object);
             var result = controller.Get(1, 1).Result;
-            result.Should().BeAssignableTo<IEnumerable<ValidationErrorDto>>();
-            result.Count().Should().Be(0);
+            result.Should().BeNull();
         }
 
         [Fact]

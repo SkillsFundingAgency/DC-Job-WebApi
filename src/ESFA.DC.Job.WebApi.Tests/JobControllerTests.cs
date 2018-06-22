@@ -373,5 +373,45 @@ namespace ESFA.DC.Job.WebApi.Tests
             result.Should().BeAssignableTo<OkResult>();
             ((OkResult)result).StatusCode.Should().Be(200);
         }
+
+        [Fact]
+        public void GetJobByStatus_FailJobDontExist_Test()
+        {
+            var jobqueServiceMock = new Mock<IJobQueueManager>();
+
+            var mockLogger = new Mock<ILogger>();
+            jobqueServiceMock.Setup(x => x.GetJobById(1)).Returns(new JobQueueManager.Models.Job()
+            {
+                JobId = 1000,
+                Status = JobStatusType.Ready,
+                Priority = 5,
+                Ukprn = 1000,
+            });
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+
+            var result = (BadRequestResult)controller.GetStatus(10);
+            result.StatusCode.Should().Be(400);
+        }
+
+        [Fact]
+        public void GetJobByStatus_Success_Test()
+        {
+            var jobqueServiceMock = new Mock<IJobQueueManager>();
+
+            var mockLogger = new Mock<ILogger>();
+            jobqueServiceMock.Setup(x => x.GetJobById(2)).Returns(new JobQueueManager.Models.Job()
+            {
+                JobId = 2,
+                Status = JobStatusType.Ready,
+                Priority = 5,
+                Ukprn = 1000,
+            });
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+
+            var result = (OkObjectResult)controller.GetStatus(2);
+            result.StatusCode.Should().Be(200);
+            result.Value.Should().BeAssignableTo<JobStatusType>();
+            result.Value.Should().Be(JobStatusType.Ready);
+        }
     }
 }
