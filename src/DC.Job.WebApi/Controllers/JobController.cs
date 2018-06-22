@@ -101,6 +101,39 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
+        [HttpGet("{jobId}/status")]
+        public ActionResult GetStatus(long jobId)
+        {
+            _logger.LogInfo($"GetJobStatus for jobId recieved {jobId}");
+
+            if (jobId == 0)
+            {
+                _logger.LogWarning($"Job Get status request received with empty data");
+                return BadRequest();
+            }
+
+            try
+            {
+                var result = _jobQueueManager.GetJobById(jobId);
+                if (result != null)
+                {
+                    _logger.LogInfo($"Successfully Got job for job Id : {jobId}");
+                    return Ok(result.Status);
+                }
+                else
+                {
+                    _logger.LogWarning($"Get status failed for job Id : {jobId}");
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Get status for job failed for jobId : {jobId}", ex);
+
+                return BadRequest();
+            }
+        }
+
         [HttpPost("{status}")]
         public ActionResult Post([FromBody]JobStatusDto jobStatusDto)
         {
