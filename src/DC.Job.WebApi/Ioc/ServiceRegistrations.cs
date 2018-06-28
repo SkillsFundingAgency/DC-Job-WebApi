@@ -20,7 +20,7 @@ namespace ESFA.DC.Job.WebApi.Ioc
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<JobQueueManager.JobQueueManager>().As<IJobQueueManager>().InstancePerLifetimeScope();
+            builder.RegisterType<JobQueueManager.IlrJobQueueManager>().As<IIlrJobQueueManager>().InstancePerLifetimeScope();
             builder.RegisterType<JsonSerializationService>().As<ISerializationService>().InstancePerLifetimeScope();
             builder.RegisterType<AzureStorageKeyValuePersistenceService>().As<IKeyValuePersistenceService>().InstancePerLifetimeScope();
             builder.RegisterType<KeyGenerator.KeyGenerator>().As<IKeyGenerator>().InstancePerLifetimeScope();
