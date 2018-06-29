@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ESFA.DC.DateTime.Provider.Interface;
 using ESFA.DC.JobQueueManager.Interfaces;
-using ESFA.DC.JobQueueManager.Models.Enums;
+using ESFA.DC.Jobs.Model;
+using ESFA.DC.Jobs.Model.Enums;
 using ESFA.DC.JobStatus.Dto;
 using ESFA.DC.JobStatus.Interface;
 using ESFA.DC.Logging.Interfaces;
@@ -15,11 +16,11 @@ namespace ESFA.DC.Job.WebApi.Controllers
     [Route("api/job")]
     public class JobController : Controller
     {
-        private readonly IJobQueueManager _jobQueueManager;
+        private readonly IIlrJobQueueManager _jobQueueManager;
         private readonly ILogger _logger;
         private readonly IDateTimeProvider _dateTimeProvider;
 
-        public JobController(IJobQueueManager jobQueueManager, ILogger logger, IDateTimeProvider dateTimeProvider)
+        public JobController(IIlrJobQueueManager jobQueueManager, ILogger logger, IDateTimeProvider dateTimeProvider)
         {
             _jobQueueManager = jobQueueManager;
             _logger = logger;
@@ -180,7 +181,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody]JobQueueManager.Models.Job job)
+        public ActionResult Post([FromBody]IlrJob job)
         {
             _logger.LogInfo("Post for job recieved for job : {@job} ", new[] { job });
             if (job == null)
@@ -276,7 +277,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
         }
 
-        private void TransformDates(List<JobQueueManager.Models.Job> jobsList)
+        private void TransformDates(List<IlrJob> jobsList)
         {
             jobsList.ForEach(x =>
             {
