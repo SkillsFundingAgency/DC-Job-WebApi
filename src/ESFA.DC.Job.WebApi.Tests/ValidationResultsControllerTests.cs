@@ -49,11 +49,11 @@ namespace ESFA.DC.Job.WebApi.Tests
             var validationerrors = "1/1/Validation Errors Report 00010101-000000.json";
             keyValuePersistenceService.Setup(x => x.ContainsAsync(validationerrors, default(CancellationToken))).Returns(Task.FromResult(true));
 
-            keyValuePersistenceService.Setup(x => x.GetAsync(validationerrors, default(CancellationToken))).Returns(Task.FromResult("test json"));
+            keyValuePersistenceService.Setup(x => x.GetAsync(validationerrors, default(CancellationToken))).Returns(Task.FromResult("{\"test\":\"1\"}"));
 
             var controller = new ValidationResultsController(keyValuePersistenceService.Object, logger.Object, jobqueServiceMock.Object, new DateTimeProvider.DateTimeProvider());
             var result = controller.Get(1, 1).Result;
-            result.Should().BeAssignableTo<OkObjectResult>("test json");
+            result.Should().BeAssignableTo<OkObjectResult>("{\"test\":\"1\"}");
         }
     }
 }
