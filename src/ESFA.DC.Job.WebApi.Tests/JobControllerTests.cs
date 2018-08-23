@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using ESFA.DC.DateTime.Provider;
+using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.Job.WebApi.Controllers;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.Jobs.Model;
@@ -26,7 +26,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var mockLogger = new Mock<ILogger>();
             jobqueServiceMock.Setup(x => x.GetAllJobs()).Returns(new List<IlrJob>());
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (OkObjectResult)controller.Get();
             result.StatusCode.Should().Be(200);
@@ -73,7 +73,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             };
             var mockLogger = new Mock<ILogger>();
             jobqueServiceMock.Setup(x => x.GetAllJobs()).Returns(jobs);
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (OkObjectResult)controller.Get();
             result.StatusCode.Should().Be(200);
@@ -90,7 +90,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var mockLogger = new Mock<ILogger>();
             jobqueServiceMock.Setup(x => x.GetJobById(2)).Returns(It.IsAny<IlrJob>());
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider.DateTimeProvider());
 
             var result = (BadRequestResult)controller.Get(1000, 0);
             result.StatusCode.Should().Be(400);
@@ -103,7 +103,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var mockLogger = new Mock<ILogger>();
             jobqueServiceMock.Setup(x => x.GetJobById(2)).Returns(It.IsAny<IlrJob>());
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestResult)controller.Get(0, 100);
             result.StatusCode.Should().Be(400);
@@ -122,7 +122,7 @@ namespace ESFA.DC.Job.WebApi.Tests
                 Priority = 5,
                 Ukprn = 1000,
             });
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (OkObjectResult)controller.Get(1000, 2);
             result.StatusCode.Should().Be(200);
@@ -141,7 +141,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var mockLogger = new Mock<ILogger>();
             jobqueServiceMock.Setup(x => x.GetJobById(2)).Returns(It.IsAny<IlrJob>());
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestResult)controller.Get(0);
             result.StatusCode.Should().Be(400);
@@ -171,7 +171,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             };
 
             jobqueServiceMock.Setup(x => x.GetJobsByUkprn(1000)).Returns(jobs);
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (OkObjectResult)controller.Get(1000);
             result.StatusCode.Should().Be(200);
@@ -186,7 +186,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestResult)controller.Post((IlrJob)null);
             result.StatusCode.Should().Be(400);
@@ -204,7 +204,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.AddJob(job)).Returns(1);
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (OkObjectResult)controller.Post(job);
             result.StatusCode.Should().Be(200);
@@ -222,7 +222,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.AddJob(job)).Returns(0);
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestResult)controller.Post(job);
             result.StatusCode.Should().Be(400);
@@ -235,7 +235,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestObjectResult)controller.Post(job);
             result.StatusCode.Should().Be(400);
@@ -251,7 +251,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestResult)controller.Post(job);
             result.StatusCode.Should().Be(400);
@@ -270,7 +270,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.UpdateJob(job)).Returns(true);
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Post(job);
             result.Should().BeAssignableTo<OkResult>();
@@ -293,7 +293,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Post(job);
             result.Should().BeAssignableTo<BadRequestObjectResult>();
@@ -306,7 +306,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Post((JobStatusDto)null);
             result.Should().BeAssignableTo<BadRequestResult>();
@@ -319,7 +319,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Post(new JobStatusDto());
             result.Should().BeAssignableTo<BadRequestResult>();
@@ -334,7 +334,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.GetJobById(100)).Returns(new IlrJob() { JobId = 100 });
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Post(new JobStatusDto()
             {
@@ -351,7 +351,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Delete(0);
             result.Should().BeAssignableTo<BadRequestResult>();
@@ -365,7 +365,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.RemoveJobFromQueue(It.IsAny<long>()));
 
             var mockLogger = new Mock<ILogger>();
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = controller.Delete(100);
             result.Should().BeAssignableTo<OkResult>();
@@ -385,7 +385,7 @@ namespace ESFA.DC.Job.WebApi.Tests
                 Priority = 5,
                 Ukprn = 1000,
             });
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (BadRequestResult)controller.GetStatus(10);
             result.StatusCode.Should().Be(400);
@@ -404,7 +404,7 @@ namespace ESFA.DC.Job.WebApi.Tests
                 Priority = 5,
                 Ukprn = 1000,
             });
-            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new DateTimeProvider());
+            var controller = new JobController(jobqueServiceMock.Object, mockLogger.Object, new Mock<IDateTimeProvider>().Object);
 
             var result = (OkObjectResult)controller.GetStatus(2);
             result.StatusCode.Should().Be(200);

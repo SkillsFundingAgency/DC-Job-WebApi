@@ -36,6 +36,7 @@ namespace ESFA.DC.Job.WebApi
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
             return ConfigureAutofac(services);
         }
 
