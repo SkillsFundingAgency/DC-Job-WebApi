@@ -11,8 +11,5 @@ namespace ESFA.DC.Job.WebApi.Settings
     {
         [JsonRequired]
         public string ApiKey { get; set; }
-
-        [JsonRequired]
-        public string ReplyToEmailAddress { get; set; }
     }
 }
