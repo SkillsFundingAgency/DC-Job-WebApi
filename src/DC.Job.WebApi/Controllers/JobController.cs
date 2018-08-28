@@ -167,11 +167,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                     return BadRequest("Invalid job Id");
                 }
 
-                job.Status = (JobStatusType)jobStatusDto.JobStatus;
-                job.TotalLearners = (int)jobStatusDto.NumberOfLearners;
-                job.IsFirstStage = job.TotalLearners == 0;
-
-                var result = _jobQueueManager.UpdateJob(job);
+                var result = _jobQueueManager.UpdateJobStatus(jobStatusDto.JobId, (JobStatusType)jobStatusDto.JobStatus);
                 if (result)
                 {
                     _logger.LogInfo($"Successfully updated job status for job Id : {jobStatusDto.JobId}");

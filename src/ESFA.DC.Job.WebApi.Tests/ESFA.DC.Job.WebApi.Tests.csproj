@@ -16,10 +16,11 @@
   <ItemGroup>
     <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.5-beta0001" />
     <PackageReference Include="ESFA.DC.ILR.ValidationErrors.Interface" Version="0.1.6-beta0001" />
-    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.16-beta0001" />
-    <PackageReference Include="ESFA.DC.Jobs.Model" Version="0.1.7-beta0001" />
+    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.19-beta0001" />
+    <PackageReference Include="ESFA.DC.Jobs.Model" Version="0.1.10-beta0001" />
     <PackageReference Include="FluentAssertions" Version="5.4.1" />
     <PackageReference Include="Moq" Version="4.8.3" />
+    <PackageReference Include="Notify" Version="2.1.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta007" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
