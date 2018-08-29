@@ -167,6 +167,13 @@ namespace ESFA.DC.Job.WebApi.Controllers
                     return BadRequest("Invalid job Id");
                 }
 
+                //If we are changing from Waiting to Ready, it means processing should go to second stage
+                if (job.Status == JobStatusType.Waiting &&
+                    (JobStatusType)jobStatusDto.JobStatus == JobStatusType.Ready)
+                {
+                    job.IsFirstStage = false;
+                }
+
                 var result = _jobQueueManager.UpdateJobStatus(jobStatusDto.JobId, (JobStatusType)jobStatusDto.JobStatus);
                 if (result)
                 {
