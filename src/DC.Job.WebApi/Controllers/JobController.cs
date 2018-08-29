@@ -174,7 +174,9 @@ namespace ESFA.DC.Job.WebApi.Controllers
                     job.IsFirstStage = false;
                 }
 
-                var result = _jobQueueManager.UpdateJobStatus(jobStatusDto.JobId, (JobStatusType)jobStatusDto.JobStatus);
+                job.Status = (JobStatusType)jobStatusDto.JobStatus;
+
+                var result = _jobQueueManager.UpdateJob(job);
                 if (result)
                 {
                     _logger.LogInfo($"Successfully updated job status for job Id : {jobStatusDto.JobId}");

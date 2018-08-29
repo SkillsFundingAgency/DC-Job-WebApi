@@ -330,7 +330,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         public void PostJob_UpdateJobStatus_Success_Test()
         {
             var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
-            jobqueServiceMock.Setup(x => x.UpdateJobStatus(It.IsAny<long>(), JobStatusType.Completed)).Returns(true);
+            jobqueServiceMock.Setup(x => x.UpdateJob(It.IsAny<IlrJob>())).Returns(true);
             jobqueServiceMock.Setup(x => x.GetJobById(100)).Returns(new IlrJob() { JobId = 100 });
 
             var mockLogger = new Mock<ILogger>();
