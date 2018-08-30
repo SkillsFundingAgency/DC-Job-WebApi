@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ESFA.DC.DateTime.Provider.Interface;
+using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.Jobs.Model;
 using ESFA.DC.Jobs.Model.Enums;
@@ -167,9 +167,14 @@ namespace ESFA.DC.Job.WebApi.Controllers
                     return BadRequest("Invalid job Id");
                 }
 
+                //If we are changing from Waiting to Ready, it means processing should go to second stage
+                if (job.Status == JobStatusType.Waiting &&
+                    (JobStatusType)jobStatusDto.JobStatus == JobStatusType.Ready)
+                {
+                    job.IsFirstStage = false;
+                }
+
                 job.Status = (JobStatusType)jobStatusDto.JobStatus;
-                job.TotalLearners = (int)jobStatusDto.NumberOfLearners;
-                job.IsFirstStage = job.TotalLearners == 0;
 
                 var result = _jobQueueManager.UpdateJob(job);
                 if (result)
