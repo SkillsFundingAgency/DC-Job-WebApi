@@ -33,8 +33,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var controller = new ValidationErrorsController(keyValuePersistenceService.Object, logger.Object, keyGenerator.Object, serializationService.Object);
             var result = controller.Get(1, 1).Result;
-            result.Should().BeAssignableTo<IEnumerable<ValidationErrorDto>>();
-            result.Count().Should().Be(0);
+            result.Should().BeNull();
         }
 
         [Fact]
@@ -48,7 +47,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var validationerrors = "1_1_ValidationErrors";
             keyGenerator.Setup(x => x.GenerateKey(1, 1, TaskKeys.ValidationErrors))
                 .Returns(validationerrors);
-            keyValuePersistenceService.Setup(x => x.ContainsAsync(validationerrors)).Returns(Task.FromResult(true));
+            keyValuePersistenceService.Setup(x => x.ContainsAsync(It.IsAny<string>())).Returns(Task.FromResult(true));
 
             var data = new List<ValidationErrorDto>()
             {

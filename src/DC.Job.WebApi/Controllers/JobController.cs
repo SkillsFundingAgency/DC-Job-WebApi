@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using ESFA.DC.DateTime.Provider.Interface;
 using ESFA.DC.JobQueueManager.Interfaces;
-using ESFA.DC.JobQueueManager.Models.Enums;
+using ESFA.DC.Jobs.Model;
+using ESFA.DC.Jobs.Model.Enums;
+using ESFA.DC.JobStatus.Dto;
+using ESFA.DC.JobStatus.Interface;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +16,11 @@ namespace ESFA.DC.Job.WebApi.Controllers
     [Route("api/job")]
     public class JobController : Controller
     {
-        private readonly IJobQueueManager _jobQueueManager;
+        private readonly IIlrJobQueueManager _jobQueueManager;
         private readonly ILogger _logger;
         private readonly IDateTimeProvider _dateTimeProvider;
 
-        public JobController(IJobQueueManager jobQueueManager, ILogger logger, IDateTimeProvider dateTimeProvider)
+        public JobController(IIlrJobQueueManager jobQueueManager, ILogger logger, IDateTimeProvider dateTimeProvider)
         {
             _jobQueueManager = jobQueueManager;
             _logger = logger;
@@ -39,16 +42,16 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 {
                     switch (x.Status)
                     {
-                        case JobStatus.Completed:
+                        case JobStatusType.Completed:
                             return 10;
-                        case JobStatus.Failed:
+                        case JobStatusType.Failed:
                             return 20;
-                        case JobStatus.FailedRetry:
+                        case JobStatusType.FailedRetry:
                             return 30;
-                        case JobStatus.Paused:
+                        case JobStatusType.Paused:
                             return 40;
-                        case JobStatus.MovedForProcessing:
-                        case JobStatus.Processing:
+                        case JobStatusType.MovedForProcessing:
+                        case JobStatusType.Processing:
                             return 50;
                         default:
                             return 60;
@@ -99,8 +102,97 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
+        [HttpGet("{jobId}/status")]
+        public ActionResult GetStatus(long jobId)
+        {
+            _logger.LogInfo($"GetJobStatus for jobId recieved {jobId}");
+
+            if (jobId == 0)
+            {
+                _logger.LogWarning($"Job Get status request received with empty data");
+                return BadRequest();
+            }
+
+            try
+            {
+                var result = _jobQueueManager.GetJobById(jobId);
+                if (result != null)
+                {
+                    _logger.LogInfo($"Successfully Got job for job Id : {jobId}");
+                    return Ok(result.Status);
+                }
+                else
+                {
+                    _logger.LogWarning($"Get status failed for job Id : {jobId}");
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Get status for job failed for jobId : {jobId}", ex);
+
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("{status}")]
+        public ActionResult Post([FromBody]JobStatusDto jobStatusDto)
+        {
+            if (jobStatusDto == null)
+            {
+                _logger.LogError($"Job Post request received with empty data for JobStatusDto");
+                return BadRequest();
+            }
+
+            _logger.LogInfo("Post for job recieved for job : {@jobStatusDto} ", new[] { jobStatusDto });
+
+            if (jobStatusDto.JobId == 0)
+            {
+                _logger.LogWarning($"Job Post request received with empty data");
+                return BadRequest();
+            }
+
+            if (!Enum.IsDefined(typeof(JobStatusType), jobStatusDto.JobStatus))
+            {
+                _logger.LogWarning($"Job Post request received with bad status {jobStatusDto.JobStatus}");
+                return BadRequest("Status is not a valid value");
+            }
+
+            try
+            {
+                var job = _jobQueueManager.GetJobById(jobStatusDto.JobId);
+                if (job == null)
+                {
+                    _logger.LogError($"JobId {jobStatusDto.JobId} is not valid for job status update");
+                    return BadRequest("Invalid job Id");
+                }
+
+                job.Status = (JobStatusType)jobStatusDto.JobStatus;
+                job.TotalLearners = (int)jobStatusDto.NumberOfLearners;
+                job.IsFirstStage = job.TotalLearners == 0;
+
+                var result = _jobQueueManager.UpdateJob(job);
+                if (result)
+                {
+                    _logger.LogInfo($"Successfully updated job status for job Id : {jobStatusDto.JobId}");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning($"Update status failed for job Id : {jobStatusDto.JobId}");
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Post for job failed for job : {@jobStatusDto}", ex, new[] { jobStatusDto });
+
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
-        public ActionResult Post([FromBody]JobQueueManager.Models.Job job)
+        public ActionResult Post([FromBody]IlrJob job)
         {
             _logger.LogInfo("Post for job recieved for job : {@job} ", new[] { job });
             if (job == null)
@@ -109,7 +201,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!Enum.IsDefined(typeof(JobStatus), job.Status))
+            if (!Enum.IsDefined(typeof(JobStatusType), job.Status))
             {
                 _logger.LogWarning($"Job Post request received with bad status {job.Status}");
                 return BadRequest("Status is not a valid value");
@@ -125,8 +217,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
             {
                 if (job.JobId > 0)
                 {
-                    if (job.Status == JobStatus.Ready || job.Status == JobStatus.Paused ||
-                        job.Status == JobStatus.FailedRetry)
+                    if (job.Status == JobStatusType.Ready || job.Status == JobStatusType.Paused ||
+                        job.Status == JobStatusType.FailedRetry)
                     {
                         _logger.LogInfo($"Going to update job with job Id : {job.JobId}");
 
@@ -196,7 +288,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
         }
 
-        private void TransformDates(List<JobQueueManager.Models.Job> jobsList)
+        private void TransformDates(List<IlrJob> jobsList)
         {
             jobsList.ForEach(x =>
             {
