@@ -7,6 +7,7 @@ using ESFA.DC.IO.Interfaces;
 using ESFA.DC.Job.WebApi.Settings;
 using ESFA.DC.JobNotifications;
 using ESFA.DC.JobNotifications.Interfaces;
+using ESFA.DC.JobQueueManager;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Json;
@@ -18,7 +19,8 @@ namespace ESFA.DC.Job.WebApi.Ioc
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<JobQueueManager.IlrJobQueueManager>().As<IIlrJobQueueManager>().InstancePerLifetimeScope();
+            builder.RegisterType<JobManager>().As<IJobManager>().InstancePerLifetimeScope();
+            builder.RegisterType<FileUploadMetaDataManager>().As<IFileUploadMetaDataManager>().InstancePerLifetimeScope();
             builder.RegisterType<JsonSerializationService>().As<ISerializationService>().InstancePerLifetimeScope();
             builder.RegisterType<AzureStorageKeyValuePersistenceService>().As<IKeyValuePersistenceService>().InstancePerLifetimeScope();
             builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
