@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.Job.Models;
-using ESFA.DC.Job.Models.Enums;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.Jobs.Model;
+using ESFA.DC.Jobs.Model.Enums;
 using ESFA.DC.JobStatus.Dto;
 using ESFA.DC.JobStatus.Interface;
 using ESFA.DC.Logging.Interfaces;
@@ -14,20 +13,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace ESFA.DC.Job.WebApi.Controllers
 {
     [Produces("application/json")]
-    [Route("api/job")]
+    [Route("api/job/file-upload")]
     public class JobController : Controller
     {
         private readonly IJobManager _jobManager;
         private readonly ILogger _logger;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IFileUploadMetaDataManager _fileUploadMetaDataManager;
+        private readonly IFileUploadJobManager _fileUploadJobManager;
 
-        public JobController(IJobManager jobManager, ILogger logger, IDateTimeProvider dateTimeProvider, IFileUploadMetaDataManager fileUploadMetaDataManager)
+        public JobController(IJobManager jobManager, ILogger logger, IDateTimeProvider dateTimeProvider, IFileUploadJobManager fileUploadMetaDataManager)
         {
             _jobManager = jobManager;
             _logger = logger;
             _dateTimeProvider = dateTimeProvider;
-            _fileUploadMetaDataManager = fileUploadMetaDataManager;
+            _fileUploadJobManager = fileUploadMetaDataManager;
         }
 
         // GET: api/Job
@@ -38,7 +37,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             try
             {
-                var jobsList = _jobManager.GetAllJobs().ToList();
+                var jobsList = _fileUploadJobManager.GetAllJobs().ToList();
                 TransformDates(jobsList);
 
                 jobsList = jobsList.OrderByDescending(x =>
@@ -82,37 +81,15 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
-            var metaData = _fileUploadMetaDataManager.GetJobMetaData(jobId);
-            if (metaData?.Ukprn != ukprn)
+            var job = _fileUploadJobManager.GetJob(jobId);
+            if (job?.Ukprn != ukprn)
             {
                 _logger.LogWarning($"Job id {jobId} ukprn {ukprn} not found");
                 return BadRequest();
             }
 
-            var job = _jobManager.GetJobById(jobId);
-
-            var jobDto = new FileUploadJobDto()
-            {
-                JobId = job.JobId,
-                DateTimeSubmittedUtc = job.DateTimeSubmittedUtc,
-                DateTimeUpdatedUtc = job.DateTimeUpdatedUtc,
-                NotifyEmail = job.NotifyEmail,
-                Priority = job.Priority,
-                SubmittedBy = job.SubmittedBy,
-                Status = (short)job.Status,
-                JobType = (short)job.JobType,
-                Ukprn = metaData.Ukprn,
-                CollectionName = metaData.CollectionName,
-                FileName = metaData.FileName,
-                FileSize = metaData.FileSize,
-                IsFirstStage = metaData.IsFirstStage,
-                PeriodNumber = metaData.PeriodNumber,
-                RowVersion = job.RowVersion,
-                StorageReference = metaData.StorageReference,
-            };
-
             _logger.LogInfo($"Returning job successfully with job id :{job.JobId}");
-            return Ok(jobDto);
+            return Ok(job);
         }
 
         [HttpGet("{ukprn}")]
@@ -126,7 +103,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
-            var jobsList = _jobManager.GetJobsByUkprn(ukprn).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
+            var jobsList = _fileUploadJobManager.GetJobsByUkprn(ukprn).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
             TransformDates(jobsList);
 
             _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
@@ -198,13 +175,13 @@ namespace ESFA.DC.Job.WebApi.Controllers
                     return BadRequest("Invalid job Id");
                 }
 
-                var metaData = _fileUploadMetaDataManager.GetJobMetaData(jobStatusDto.JobId);
+                var metaData = _fileUploadJobManager.GetJob(jobStatusDto.JobId);
 
                 //If we are changing from Waiting to Ready, it means processing should go to second stage
                 if (job.Status == JobStatusType.Waiting &&
                     (JobStatusType)jobStatusDto.JobStatus == JobStatusType.Ready)
                 {
-                    _fileUploadMetaDataManager.UpdateJobStage(job.JobId, metaData.IsFirstStage);
+                    _fileUploadJobManager.UpdateJobStage(job.JobId, !metaData.IsFirstStage);
                 }
 
                 var result = _jobManager.UpdateJobStatus(job.JobId, (JobStatusType)jobStatusDto.JobStatus);
@@ -229,7 +206,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody]FileUploadJobDto job)
+        public ActionResult Post([FromBody]FileUploadJob job)
         {
             _logger.LogInfo("Post for job recieved for job : {@job} ", new[] { job });
             if (job == null)
@@ -252,7 +229,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             try
             {
-                var jobModel = new Models.Job()
+                var jobModel = new Jobs.Model.Job()
                 {
                     Status = (JobStatusType)job.Status,
                     JobId = job.JobId,
@@ -265,8 +242,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
                 if (job.JobId > 0)
                 {
-                    if (job.Status == (short)JobStatusType.Ready || job.Status == (short)JobStatusType.Paused ||
-                        job.Status == (short)JobStatusType.FailedRetry)
+                    if (job.Status == JobStatusType.Ready || job.Status == JobStatusType.Paused ||
+                        job.Status == JobStatusType.FailedRetry)
                     {
                         _logger.LogInfo($"Going to update job with job Id : {job.JobId}");
 
@@ -292,20 +269,10 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 {
                     _logger.LogInfo($"Create Job request received with object : {job} ");
 
-                    job.JobId = _jobManager.AddJob(jobModel);
+                    job.JobId = _fileUploadJobManager.AddJob(job);
+
                     if (job.JobId > 0)
                     {
-                        _fileUploadMetaDataManager.AddJobMetData(new FileUploadJobMetaData()
-                        {
-                            JobId = job.JobId,
-                            Ukprn = job.Ukprn ?? 0,
-                            CollectionName = job.CollectionName,
-                            FileSize = job.FileSize,
-                            PeriodNumber = job.PeriodNumber,
-                            IsFirstStage = job.IsFirstStage,
-                            StorageReference = job.StorageReference,
-                            FileName = job.FileName,
-                        });
                         _logger.LogInfo($"Created job successfully with Id : {job.JobId} ");
                         return Ok(job.JobId);
                     }
@@ -347,7 +314,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
         }
 
-        private void TransformDates(List<Models.Job> jobsList)
+        private void TransformDates(List<FileUploadJob> jobsList)
         {
             jobsList.ForEach(x =>
             {

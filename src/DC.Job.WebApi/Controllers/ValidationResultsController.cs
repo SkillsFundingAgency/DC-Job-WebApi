@@ -18,23 +18,20 @@ namespace ESFA.DC.Job.WebApi.Controllers
     {
         private readonly IKeyValuePersistenceService _keyValuePersistenceService;
         private readonly ILogger _logger;
-        private readonly IFileUploadMetaDataManager _fileUploadMetaDataManager;
+        private readonly IFileUploadJobManager _fileUploadMetaDataManager;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IJobManager _jobManager;
         private readonly string _reportFileName = "{0}/{1}/Validation Errors Report {2}.json";
 
         public ValidationResultsController(
             IKeyValuePersistenceService keyValuePersistenceService,
             ILogger logger,
-            IFileUploadMetaDataManager fileUploadMetaDataManager,
-            IDateTimeProvider dateTimeProvider,
-            IJobManager jobManager)
+            IFileUploadJobManager fileUploadMetaDataManager,
+            IDateTimeProvider dateTimeProvider)
         {
             _keyValuePersistenceService = keyValuePersistenceService;
             _logger = logger;
             _fileUploadMetaDataManager = fileUploadMetaDataManager;
             _dateTimeProvider = dateTimeProvider;
-            _jobManager = jobManager;
         }
 
         [HttpGet("{ukprn}/{jobId}")]
@@ -48,15 +45,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return new BadRequestResult();
             }
 
-            var metaData = _fileUploadMetaDataManager.GetJobMetaData(jobId);
-            if (metaData == null || metaData.Ukprn != ukprn)
-            {
-                _logger.LogWarning($"No job found for jobId : {jobId}, ukprn : {ukprn}");
-                return new BadRequestResult();
-            }
-
-            var job = _jobManager.GetJobById(jobId);
-            if (job == null)
+            var job = _fileUploadMetaDataManager.GetJob(jobId);
+            if (job == null || job.Ukprn != ukprn)
             {
                 _logger.LogWarning($"No job found for jobId : {jobId}, ukprn : {ukprn}");
                 return new BadRequestResult();
