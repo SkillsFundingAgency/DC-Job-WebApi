@@ -43,7 +43,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             var jobMetaServiceMock = new Mock<IFileUploadJobManager>();
 
             var mockLogger = new Mock<ILogger>();
-            jobMetaServiceMock.Setup(x => x.GetJob(1)).Returns(new FileUploadJob() { JobId = 1, Ukprn = 1 });
+            jobMetaServiceMock.Setup(x => x.GetJobById(1)).Returns(new FileUploadJob() { JobId = 1, Ukprn = 1 });
 
             var validationerrors = "1/1/Validation Errors Report 00010101-000000.json";
             keyValuePersistenceService.Setup(x => x.ContainsAsync(validationerrors, default(CancellationToken))).Returns(Task.FromResult(true));

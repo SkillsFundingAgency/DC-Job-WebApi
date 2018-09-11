@@ -81,7 +81,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return BadRequest();
             }
 
-            var job = _fileUploadJobManager.GetJob(jobId);
+            var job = _fileUploadJobManager.GetJobById(jobId);
             if (job?.Ukprn != ukprn)
             {
                 _logger.LogWarning($"Job id {jobId} ukprn {ukprn} not found");
@@ -175,7 +175,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                     return BadRequest("Invalid job Id");
                 }
 
-                var metaData = _fileUploadJobManager.GetJob(jobStatusDto.JobId);
+                var metaData = _fileUploadJobManager.GetJobById(jobStatusDto.JobId);
 
                 //If we are changing from Waiting to Ready, it means processing should go to second stage
                 if (job.Status == JobStatusType.Waiting &&

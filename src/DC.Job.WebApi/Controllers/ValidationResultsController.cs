@@ -45,7 +45,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return new BadRequestResult();
             }
 
-            var job = _fileUploadMetaDataManager.GetJob(jobId);
+            var job = _fileUploadMetaDataManager.GetJobById(jobId);
             if (job == null || job.Ukprn != ukprn)
             {
                 _logger.LogWarning($"No job found for jobId : {jobId}, ukprn : {ukprn}");

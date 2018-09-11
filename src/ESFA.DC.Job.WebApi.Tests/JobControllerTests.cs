@@ -85,7 +85,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         public void GetJobByJobId_ZeroJobIdValue_Test()
         {
             var jobqueMetaServiceMock = new Mock<IFileUploadJobManager>();
-            jobqueMetaServiceMock.Setup(x => x.GetJob(2)).Returns(It.IsAny<FileUploadJob>());
+            jobqueMetaServiceMock.Setup(x => x.GetJobById(2)).Returns(It.IsAny<FileUploadJob>());
 
             var controller = GetController(null, jobqueMetaServiceMock.Object);
 
@@ -106,7 +106,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         public void GetJobByJobId_Success_Test()
         {
             var jobqueMetaServiceMock = new Mock<IFileUploadJobManager>();
-            jobqueMetaServiceMock.Setup(x => x.GetJob(2)).Returns(new FileUploadJob()
+            jobqueMetaServiceMock.Setup(x => x.GetJobById(2)).Returns(new FileUploadJob()
             {
                 JobId = 2,
                 Status = JobStatusType.Ready,
@@ -345,7 +345,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         public void GetJobByStatus_FailJobDontExist_Test()
         {
             var jobqueServiceMock = new Mock<IFileUploadJobManager>();
-            jobqueServiceMock.Setup(x => x.GetJob(1)).Returns(new FileUploadJob()
+            jobqueServiceMock.Setup(x => x.GetJobById(1)).Returns(new FileUploadJob()
             {
                 JobId = 1,
                 Status = JobStatusType.Ready,

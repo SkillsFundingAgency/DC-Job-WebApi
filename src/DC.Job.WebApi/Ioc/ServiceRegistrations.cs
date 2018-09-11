@@ -25,6 +25,7 @@ namespace ESFA.DC.Job.WebApi.Ioc
             builder.RegisterType<AzureStorageKeyValuePersistenceService>().As<IKeyValuePersistenceService>().InstancePerLifetimeScope();
             builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
             builder.RegisterType<EmailNotifier>().As<IEmailNotifier>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailTemplateManager>().As<IEmailTemplateManager>().InstancePerLifetimeScope();
 
             builder.Register(context =>
                 {
