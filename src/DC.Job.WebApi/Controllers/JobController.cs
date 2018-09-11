@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ESFA.DC.Job.WebApi.Controllers
 {
     [Produces("application/json")]
-    [Route("api/job/file-upload")]
+    [Route("api/job")]
     public class JobController : Controller
     {
         private readonly IJobManager _jobManager;
