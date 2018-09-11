@@ -27,11 +27,10 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var keyValuePersistenceService = new Mock<IKeyValuePersistenceService>();
             var logger = new Mock<ESFA.DC.Logging.Interfaces.ILogger>();
-            var serializationService = new Mock<ISerializationService>();
 
             keyValuePersistenceService.Setup(x => x.ContainsAsync("1_1_1", default(CancellationToken))).Returns(Task.FromResult(false));
 
-            var controller = new ValidationResultsController(keyValuePersistenceService.Object, logger.Object, new Mock<IIlrJobQueueManager>().Object, new Mock<IDateTimeProvider>().Object);
+            var controller = new ValidationResultsController(keyValuePersistenceService.Object, logger.Object, new Mock<IFileUploadJobManager>().Object, new Mock<IDateTimeProvider>().Object);
             var result = controller.Get(1, 1).Result;
             result.Should().BeAssignableTo<BadRequestResult>();
         }
@@ -41,17 +40,17 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var keyValuePersistenceService = new Mock<IKeyValuePersistenceService>();
             var logger = new Mock<ESFA.DC.Logging.Interfaces.ILogger>();
-            var jobqueServiceMock = new Mock<IIlrJobQueueManager>();
+            var jobMetaServiceMock = new Mock<IFileUploadJobManager>();
 
             var mockLogger = new Mock<ILogger>();
-            jobqueServiceMock.Setup(x => x.GetJobById(1)).Returns(new IlrJob() { JobId = 1, Ukprn = 1 });
+            jobMetaServiceMock.Setup(x => x.GetJob(1)).Returns(new FileUploadJob() { JobId = 1, Ukprn = 1 });
 
             var validationerrors = "1/1/Validation Errors Report 00010101-000000.json";
             keyValuePersistenceService.Setup(x => x.ContainsAsync(validationerrors, default(CancellationToken))).Returns(Task.FromResult(true));
 
             keyValuePersistenceService.Setup(x => x.GetAsync(validationerrors, default(CancellationToken))).Returns(Task.FromResult("{\"test\":\"1\"}"));
 
-            var controller = new ValidationResultsController(keyValuePersistenceService.Object, logger.Object, jobqueServiceMock.Object, new DateTimeProvider.DateTimeProvider());
+            var controller = new ValidationResultsController(keyValuePersistenceService.Object, logger.Object, jobMetaServiceMock.Object, new DateTimeProvider.DateTimeProvider());
             var result = controller.Get(1, 1).Result;
             result.Should().BeAssignableTo<OkObjectResult>("{\"test\":\"1\"}");
         }
