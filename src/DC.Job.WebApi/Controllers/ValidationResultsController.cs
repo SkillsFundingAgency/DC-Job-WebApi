@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
+using Autofac.Features.Indexed;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.IO.Interfaces;
 using ESFA.DC.JobQueueManager.Interfaces;
+using ESFA.DC.Jobs.Model.Enums;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -16,19 +19,19 @@ namespace ESFA.DC.Job.WebApi.Controllers
     [Route("api/[controller]")]
     public class ValidationResultsController : ControllerBase
     {
-        private readonly IKeyValuePersistenceService _keyValuePersistenceService;
         private readonly ILogger _logger;
         private readonly IFileUploadJobManager _fileUploadMetaDataManager;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly string _reportFileName = "{0}/{1}/Validation Errors Report {2}.json";
+        private readonly IIndex<JobType, IKeyValuePersistenceService> _storagePersistenceServices;
 
         public ValidationResultsController(
-            IKeyValuePersistenceService keyValuePersistenceService,
+            IIndex<JobType, IKeyValuePersistenceService> storagePersistenceServices,
             ILogger logger,
             IFileUploadJobManager fileUploadMetaDataManager,
             IDateTimeProvider dateTimeProvider)
         {
-            _keyValuePersistenceService = keyValuePersistenceService;
+            _storagePersistenceServices = storagePersistenceServices;
             _logger = logger;
             _fileUploadMetaDataManager = fileUploadMetaDataManager;
             _dateTimeProvider = dateTimeProvider;
@@ -55,10 +58,11 @@ namespace ESFA.DC.Job.WebApi.Controllers
             var fileName = GetFileName(ukprn, jobId, job.DateTimeSubmittedUtc);
             try
             {
-                var exists = await _keyValuePersistenceService.ContainsAsync(fileName);
+                var keyValuePersistenceService = GetKeyValuePersistenceService(job.JobType);
+                var exists = await keyValuePersistenceService.ContainsAsync(fileName);
                 if (exists)
                 {
-                    var data = await _keyValuePersistenceService.GetAsync(fileName);
+                    var data = await keyValuePersistenceService.GetAsync(fileName);
                     return Ok(JsonConvert.DeserializeObject(data));
                 }
             }
@@ -68,13 +72,18 @@ namespace ESFA.DC.Job.WebApi.Controllers
                 return new BadRequestResult();
             }
 
-            return null;
+            return new NotFoundResult();
         }
 
         public string GetFileName(long ukprn, long jobId, DateTime dateTimeUtc)
         {
             var jobDateTime = _dateTimeProvider.ConvertUtcToUk(dateTimeUtc).ToString("yyyyMMdd-HHmmss");
             return string.Format(_reportFileName, ukprn, jobId, jobDateTime);
+        }
+
+        public IKeyValuePersistenceService GetKeyValuePersistenceService(JobType jobType)
+        {
+            return _storagePersistenceServices[jobType];
         }
     }
 }
