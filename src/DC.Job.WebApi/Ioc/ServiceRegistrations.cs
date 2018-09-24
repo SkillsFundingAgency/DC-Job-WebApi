@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using ESFA.DC.DateTime.Provider;
-using ESFA.DC.DateTime.Provider.Interface;
-using ESFA.DC.ILR.ValidationErrors;
-using ESFA.DC.ILR.ValidationErrors.Interface;
+using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.IO.AzureStorage;
+using ESFA.DC.IO.AzureStorage.Config.Interfaces;
 using ESFA.DC.IO.Interfaces;
 using ESFA.DC.Job.WebApi.Settings;
+using ESFA.DC.JobNotifications;
+using ESFA.DC.JobNotifications.Interfaces;
+using ESFA.DC.JobQueueManager;
 using ESFA.DC.JobQueueManager.Interfaces;
-using ESFA.DC.KeyGenerator.Interface;
+using ESFA.DC.Jobs.Model.Enums;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Json;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +21,24 @@ namespace ESFA.DC.Job.WebApi.Ioc
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<JobQueueManager.IlrJobQueueManager>().As<IIlrJobQueueManager>().InstancePerLifetimeScope();
+            builder.RegisterType<JobManager>().As<IJobManager>().InstancePerLifetimeScope();
+            builder.RegisterType<FileUploadJobManager>().As<IFileUploadJobManager>().InstancePerLifetimeScope();
             builder.RegisterType<JsonSerializationService>().As<ISerializationService>().InstancePerLifetimeScope();
-            builder.RegisterType<AzureStorageKeyValuePersistenceService>().As<IKeyValuePersistenceService>().InstancePerLifetimeScope();
-            builder.RegisterType<KeyGenerator.KeyGenerator>().As<IKeyGenerator>().InstancePerLifetimeScope();
-            builder.RegisterType<DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailNotifier>().As<IEmailNotifier>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailTemplateManager>().As<IEmailTemplateManager>().InstancePerLifetimeScope();
+
+            builder.Register(context =>
+            {
+                var config = context.ResolveKeyed<IAzureStorageKeyValuePersistenceServiceConfig>(JobType.IlrSubmission);
+                return new AzureStorageKeyValuePersistenceService(config);
+            }).Keyed<IKeyValuePersistenceService>(JobType.IlrSubmission).InstancePerLifetimeScope();
+
+            builder.Register(context =>
+            {
+                var config = context.ResolveKeyed<IAzureStorageKeyValuePersistenceServiceConfig>(JobType.EsfSubmission);
+                return new AzureStorageKeyValuePersistenceService(config);
+            }).Keyed<IKeyValuePersistenceService>(JobType.EsfSubmission).InstancePerLifetimeScope();
 
             builder.Register(context =>
                 {

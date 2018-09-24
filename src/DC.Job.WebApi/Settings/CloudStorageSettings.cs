@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace ESFA.DC.Job.WebApi.Settings
 {
-    public class AzureStorageKeyValuePersistenceServiceConfig : IAzureStorageKeyValuePersistenceServiceConfig
+    public class CloudStorageSettings : IAzureStorageKeyValuePersistenceServiceConfig
     {
         [JsonRequired]
         public string ConnectionString { get; set; }
