@@ -38,7 +38,6 @@ namespace ESFA.DC.Job.WebApi.Controllers
             try
             {
                 var jobsList = _fileUploadJobManager.GetAllJobs().ToList();
-                TransformDates(jobsList);
 
                 jobsList = jobsList.OrderByDescending(x =>
                 {
@@ -104,7 +103,6 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
 
             var jobsList = _fileUploadJobManager.GetJobsByUkprn(ukprn).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
-            TransformDates(jobsList);
 
             _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
             return Ok(jobsList);
@@ -312,15 +310,6 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
                 return BadRequest();
             }
-        }
-
-        private void TransformDates(List<FileUploadJob> jobsList)
-        {
-            jobsList.ForEach(x =>
-            {
-                x.DateTimeSubmittedUtc = _dateTimeProvider.ConvertUtcToUk(x.DateTimeSubmittedUtc);
-                x.DateTimeUpdatedUtc = _dateTimeProvider.ConvertUtcToUk(x.DateTimeUpdatedUtc.GetValueOrDefault());
-            });
         }
     }
 }
