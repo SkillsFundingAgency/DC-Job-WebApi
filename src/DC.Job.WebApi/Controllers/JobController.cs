@@ -141,6 +141,45 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
         }
 
+        [HttpPost("cross-loading/status/{jobId}/{status}")]
+        public ActionResult Post([FromRoute]long jobId, [FromRoute]JobStatusType status)
+        {
+            if (jobId == 0)
+            {
+                _logger.LogWarning($"Job Post request received with empty data");
+                return BadRequest();
+            }
+
+            try
+            {
+                var job = _jobManager.GetJobById(jobId);
+                if (job == null)
+                {
+                    _logger.LogError($"JobId {jobId} is not valid for job status update");
+                    return BadRequest("Invalid job Id");
+                }
+
+                var result = _jobManager.UpdateCrossLoadingStatus(job.JobId, status);
+
+                if (result)
+                {
+                    _logger.LogInfo($"Successfully updated cross loading job status for job Id : {jobId}");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning($"Update cross loading status failed for job Id : {jobId}");
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Post for cross loading status post job failed for job : {jobId}", ex);
+
+                return BadRequest();
+            }
+        }
+
         [HttpPost("{status}")]
         public ActionResult Post([FromBody]JobStatusDto jobStatusDto)
         {
