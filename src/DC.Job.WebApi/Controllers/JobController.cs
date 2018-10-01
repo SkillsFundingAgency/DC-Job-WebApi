@@ -38,7 +38,6 @@ namespace ESFA.DC.Job.WebApi.Controllers
             try
             {
                 var jobsList = _fileUploadJobManager.GetAllJobs().ToList();
-                TransformDates(jobsList);
 
                 jobsList = jobsList.OrderByDescending(x =>
                 {
@@ -104,7 +103,6 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
 
             var jobsList = _fileUploadJobManager.GetJobsByUkprn(ukprn).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
-            TransformDates(jobsList);
 
             _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
             return Ok(jobsList);
@@ -138,6 +136,45 @@ namespace ESFA.DC.Job.WebApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Get status for job failed for jobId : {jobId}", ex);
+
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("cross-loading/status/{jobId}/{status}")]
+        public ActionResult Post([FromRoute]long jobId, [FromRoute]JobStatusType status)
+        {
+            if (jobId == 0)
+            {
+                _logger.LogWarning($"Job Post request received with empty data");
+                return BadRequest();
+            }
+
+            try
+            {
+                var job = _jobManager.GetJobById(jobId);
+                if (job == null)
+                {
+                    _logger.LogError($"JobId {jobId} is not valid for job status update");
+                    return BadRequest("Invalid job Id");
+                }
+
+                var result = _jobManager.UpdateCrossLoadingStatus(job.JobId, status);
+
+                if (result)
+                {
+                    _logger.LogInfo($"Successfully updated cross loading job status for job Id : {jobId}");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning($"Update cross loading status failed for job Id : {jobId}");
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Post for cross loading status post job failed for job : {jobId}", ex);
 
                 return BadRequest();
             }
@@ -312,15 +349,6 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
                 return BadRequest();
             }
-        }
-
-        private void TransformDates(List<FileUploadJob> jobsList)
-        {
-            jobsList.ForEach(x =>
-            {
-                x.DateTimeSubmittedUtc = _dateTimeProvider.ConvertUtcToUk(x.DateTimeSubmittedUtc);
-                x.DateTimeUpdatedUtc = _dateTimeProvider.ConvertUtcToUk(x.DateTimeUpdatedUtc.GetValueOrDefault());
-            });
         }
     }
 }
