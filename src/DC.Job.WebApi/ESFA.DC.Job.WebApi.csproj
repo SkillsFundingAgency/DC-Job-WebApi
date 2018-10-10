@@ -24,10 +24,11 @@
     <PackageReference Include="autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Configuration" Version="4.1.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
-    <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.5-beta0001" />
-    <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.5-beta0001" />
+    <PackageReference Include="ESFA.DC.CollectionsManagement.Services" Version="0.1.17-beta0001" />
+    <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.6-beta0001" />
+    <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.IO.AzureStorage" Version="0.1.14-beta0001" />
-    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.34-beta0001" />
+    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.40-beta0001" />
     <PackageReference Include="ESFA.DC.Jobs.Model" Version="0.1.22-beta0001" />
     <PackageReference Include="ESFA.DC.JobStatus" Version="0.1.12-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.1-beta0001" />
