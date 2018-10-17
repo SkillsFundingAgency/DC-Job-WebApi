@@ -70,7 +70,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpGet("{ukprn}/{jobId}")]
-        public IActionResult Get(long ukprn, long jobId)
+        public IActionResult GetById(long ukprn, long jobId)
         {
             _logger.LogInfo($"Request recieved to get the with Id : {jobId}, ukprn : {ukprn}");
 
@@ -92,7 +92,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpGet("{ukprn}")]
-        public IActionResult Get(long ukprn)
+        public IActionResult GetForUkprn(long ukprn)
         {
             _logger.LogInfo($"Request recieved to get the with ukprn : {ukprn}");
 
@@ -109,7 +109,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpGet("{ukprn}/period/{period}")]
-        public IActionResult Get(long ukprn, int period)
+        public IActionResult GetForPeriod(long ukprn, int period)
         {
             _logger.LogInfo($"Request recieved to get the with ukprn : {ukprn}, period : {period}");
 

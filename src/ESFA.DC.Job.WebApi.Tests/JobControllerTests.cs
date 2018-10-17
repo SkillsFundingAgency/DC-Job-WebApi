@@ -89,7 +89,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var controller = GetController(null, jobqueMetaServiceMock.Object);
 
-            var result = (BadRequestResult)controller.Get(1000, 0);
+            var result = (BadRequestResult)controller.GetById(1000, 0);
             result.StatusCode.Should().Be(400);
         }
 
@@ -98,7 +98,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var controller = GetController();
 
-            var result = (BadRequestResult)controller.Get(0, 100);
+            var result = (BadRequestResult)controller.GetById(0, 100);
             result.StatusCode.Should().Be(400);
         }
 
@@ -116,7 +116,7 @@ namespace ESFA.DC.Job.WebApi.Tests
 
             var controller = GetController(null, jobqueMetaServiceMock.Object);
 
-            var result = (OkObjectResult)controller.Get(1000, 2);
+            var result = (OkObjectResult)controller.GetById(1000, 2);
             result.StatusCode.Should().Be(200);
 
             var outputJob = (FileUploadJob)result.Value;
@@ -131,7 +131,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         {
             var controller = GetController();
 
-            var result = (BadRequestResult)controller.Get(0);
+            var result = (BadRequestResult)controller.GetForUkprn(0);
             result.StatusCode.Should().Be(400);
         }
 
@@ -158,7 +158,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             jobqueServiceMock.Setup(x => x.GetJobsByUkprn(1000)).Returns(jobs);
             var controller = GetController(null, jobqueServiceMock.Object);
 
-            var result = (OkObjectResult)controller.Get(1000);
+            var result = (OkObjectResult)controller.GetForUkprn(1000);
             result.StatusCode.Should().Be(200);
 
             var outputJobs = (List<FileUploadJob>)result.Value;
