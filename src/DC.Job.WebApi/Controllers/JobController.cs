@@ -108,6 +108,23 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
+        [HttpGet("{ukprn}/period/{period}")]
+        public IActionResult Get(long ukprn, int period)
+        {
+            _logger.LogInfo($"Request recieved to get the with ukprn : {ukprn}, period : {period}");
+
+            if (ukprn == 0 || period == 0)
+            {
+                _logger.LogWarning($"Request recieved with ukprn 0");
+                return BadRequest();
+            }
+
+            var jobsList = _fileUploadJobManager.GetJobsByUkprnForPeriod(ukprn, period).ToList();
+
+            _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
+            return Ok(jobsList);
+        }
+
         [HttpGet("{jobId}/status")]
         public ActionResult GetStatus(long jobId)
         {

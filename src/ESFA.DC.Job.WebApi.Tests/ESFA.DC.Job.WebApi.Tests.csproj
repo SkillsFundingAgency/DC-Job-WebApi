@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.ILR.ValidationErrors.Interface" Version="0.1.6-beta0001" />
-    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.42-beta0001" />
+    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.45-beta0001" />
     <PackageReference Include="ESFA.DC.Jobs.Model" Version="0.1.22-beta0001" />
     <PackageReference Include="FluentAssertions" Version="5.4.1" />
     <PackageReference Include="Moq" Version="4.8.3" />
