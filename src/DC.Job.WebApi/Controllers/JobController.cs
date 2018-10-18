@@ -70,7 +70,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpGet("{ukprn}/{jobId}")]
-        public IActionResult Get(long ukprn, long jobId)
+        public IActionResult GetById(long ukprn, long jobId)
         {
             _logger.LogInfo($"Request recieved to get the with Id : {jobId}, ukprn : {ukprn}");
 
@@ -92,7 +92,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         [HttpGet("{ukprn}")]
-        public IActionResult Get(long ukprn)
+        public IActionResult GetForUkprn(long ukprn)
         {
             _logger.LogInfo($"Request recieved to get the with ukprn : {ukprn}");
 
@@ -103,6 +103,23 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
 
             var jobsList = _fileUploadJobManager.GetJobsByUkprn(ukprn).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
+
+            _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
+            return Ok(jobsList);
+        }
+
+        [HttpGet("{ukprn}/period/{period}")]
+        public IActionResult GetForPeriod(long ukprn, int period)
+        {
+            _logger.LogInfo($"Request recieved to get the with ukprn : {ukprn}, period : {period}");
+
+            if (ukprn == 0 || period == 0)
+            {
+                _logger.LogWarning($"Request recieved with ukprn 0");
+                return BadRequest();
+            }
+
+            var jobsList = _fileUploadJobManager.GetJobsByUkprnForPeriod(ukprn, period).ToList();
 
             _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn :{ukprn}");
             return Ok(jobsList);
