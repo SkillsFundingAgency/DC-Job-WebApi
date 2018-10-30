@@ -3,7 +3,6 @@ using ESFA.DC.IO.AzureStorage.Config.Interfaces;
 using ESFA.DC.Job.WebApi.Extensions;
 using ESFA.DC.Job.WebApi.Settings;
 using ESFA.DC.JobNotifications;
-using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.Jobs.Model.Enums;
 using Microsoft.Extensions.Configuration;
 
