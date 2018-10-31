@@ -250,6 +250,11 @@ namespace ESFA.DC.Job.WebApi.Controllers
                         return Ok();
                     }
 
+                    if (metaData.IsFirstStage)
+                    {
+                        return Ok();
+                    }
+
                     result = _jobManager.UpdateCrossLoadingStatus(job.JobId, JobStatusType.Completed);
 
                     if (result)
