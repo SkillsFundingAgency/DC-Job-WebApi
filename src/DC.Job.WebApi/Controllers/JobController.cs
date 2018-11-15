@@ -107,6 +107,23 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
+        [HttpGet("{ukprn}/{startDateTimeUtc}/{endDateTimeUtc}")]
+        public IActionResult GetForUkprn(long ukprn, DateTime startDateTimeUtc, DateTime endDateTimeUtc)
+        {
+            _logger.LogInfo($"Request received to get the with ukprn: {ukprn}, start date :{startDateTimeUtc}, end date : {endDateTimeUtc}");
+
+            if (ukprn == 0)
+            {
+                _logger.LogWarning("Request received with ukprn 0");
+                return BadRequest();
+            }
+
+            var jobsList = _fileUploadJobManager.GetJobsByUkprnForDateRange(ukprn, startDateTimeUtc, endDateTimeUtc).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
+
+            _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn: {ukprn}");
+            return Ok(jobsList);
+        }
+
         [HttpGet("{ukprn}/period/{period}")]
         public IActionResult GetForPeriod(long ukprn, int period)
         {
