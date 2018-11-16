@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using ESFA.DC.CollectionsManagement.Services;
-using ESFA.DC.CollectionsManagement.Services.Interface;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.IO.AzureStorage;
 using ESFA.DC.IO.AzureStorage.Config.Interfaces;
