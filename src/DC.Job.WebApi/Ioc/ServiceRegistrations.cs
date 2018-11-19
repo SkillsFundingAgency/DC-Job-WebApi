@@ -9,7 +9,10 @@ using ESFA.DC.Job.WebApi.Settings;
 using ESFA.DC.JobNotifications;
 using ESFA.DC.JobNotifications.Interfaces;
 using ESFA.DC.JobQueueManager;
+using ESFA.DC.JobQueueManager.Data;
+using ESFA.DC.JobQueueManager.ExternalData;
 using ESFA.DC.JobQueueManager.Interfaces;
+using ESFA.DC.JobQueueManager.Interfaces.ExternalData;
 using ESFA.DC.Jobs.Model.Enums;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Json;
@@ -45,14 +48,14 @@ namespace ESFA.DC.Job.WebApi.Ioc
             builder.Register(context =>
                 {
                     var queueManagerSettings = context.Resolve<JobQueueManagerSettings>();
-                    var optionsBuilder = new DbContextOptionsBuilder();
+                    var optionsBuilder = new DbContextOptionsBuilder<JobQueueDataContext>();
                     optionsBuilder.UseSqlServer(
                         queueManagerSettings.ConnectionString,
                         options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
 
                     return optionsBuilder.Options;
                 })
-                .As<DbContextOptions>()
+                .As<DbContextOptions<JobQueueDataContext>>()
                 .SingleInstance();
         }
     }
