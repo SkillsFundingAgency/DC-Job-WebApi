@@ -1,5 +1,4 @@
-﻿using ESFA.DC.JobQueueManager.Interfaces;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace ESFA.DC.Job.WebApi.Settings
 {

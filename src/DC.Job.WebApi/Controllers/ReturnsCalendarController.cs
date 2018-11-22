@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using ESFA.DC.CollectionsManagement.Models;
-using ESFA.DC.CollectionsManagement.Services.Interface;
+using ESFA.DC.JobQueueManager.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ESFA.DC.Job.WebApi.Controllers
