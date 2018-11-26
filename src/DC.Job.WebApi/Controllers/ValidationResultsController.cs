@@ -22,7 +22,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
         private readonly ILogger _logger;
         private readonly IFileUploadJobManager _fileUploadMetaDataManager;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly string _reportFileName = "{0}/{1}/Validation Errors Report {2}.json";
+        private readonly string _reportFileName = "{0}/{1}/Rule Violation Report {2}.json";
         private readonly IIndex<JobType, IKeyValuePersistenceService> _storagePersistenceServices;
 
         public ValidationResultsController(
