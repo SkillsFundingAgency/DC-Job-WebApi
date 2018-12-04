@@ -24,10 +24,10 @@ namespace ESFA.DC.Job.WebApi.Controllers
         private readonly ILogger _logger;
 
         public FileValidationController(
-            //IFcsContext fcsContext,
+            IFcsContext fcsContext,
             ILogger logger)
         {
-            //_fcsContext = fcsContext;
+            _fcsContext = fcsContext;
             _logger = logger;
         }
 
@@ -75,9 +75,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             try
             {
-                var existsAny = true;
-                //var existsAny = _fcsContext.ContractAllocations
-                //    .Any(ca => ca.DeliveryUKPRN == ukprn && ca.ContractAllocationNumber == contractReference);
+                var existsAny = _fcsContext.ContractAllocation
+                    .Any(ca => ca.DeliveryUkprn == ukprn && ca.ContractAllocationNumber == contractReference);
                 if (existsAny)
                 {
                     return Ok();

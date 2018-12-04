@@ -158,6 +158,23 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(job);
         }
 
+        [HttpGet("{ukprn}/{contractReference}/{collectionName}/latest")]
+        public IActionResult GetLatestJob(long ukprn, string contractReference, string collectionName)
+        {
+            _logger.LogInfo($"Request received to get the with ukprn: {ukprn}, contract reference: {contractReference}, collection name :{collectionName}");
+
+            if (ukprn == 0 || string.IsNullOrEmpty(collectionName) || string.IsNullOrEmpty(contractReference))
+            {
+                _logger.LogWarning($"Request received with ukprn {ukprn}, contract reference: {contractReference}, collection name :{collectionName}, returning bad request");
+                return BadRequest();
+            }
+
+            var job = _fileUploadJobManager.GetLatestJobByUkprnAndContractReference(ukprn, contractReference, collectionName);
+
+            _logger.LogInfo($"Returning job successfully for ukprn :{ukprn}, contract reference: {contractReference}, collection name :{collectionName}");
+            return Ok(job);
+        }
+
         [HttpGet("{jobId}/status")]
         public ActionResult GetStatus(long jobId)
         {
