@@ -31,6 +31,37 @@ namespace ESFA.DC.Job.WebApi.Controllers
             _logger = logger;
         }
 
+        [HttpGet("org/{ukprn}")]
+        public async Task<IActionResult> ValidateUkprnOrganisation(long ukprn)
+        {
+            _logger.LogInfo($"Get request recieved to validate ukprn for orgs db : {ukprn}");
+
+            if (ukprn < 1)
+            {
+                _logger.LogWarning($"invalid ukprn : {ukprn}");
+                return new BadRequestResult();
+            }
+
+            try
+            {
+                var existsAny = true;
+                //var existsAny = _fcsContext.ContractAllocations
+                //    .Any(ca => ca.DeliveryUKPRN == ukprn && ca.ContractAllocationNumber == contractReference);
+                if (existsAny)
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    $"Error occured trying to validate ukprn for orgs db : {ukprn}", ex);
+                return new BadRequestResult();
+            }
+
+            return NotFound();
+        }
+
         [HttpGet("conref/{ukprn}/{contractReference}")]
         public async Task<IActionResult> ValidateContractReference(long ukprn, string contractReference)
         {
@@ -44,7 +75,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             try
             {
-                var existsAny = false;
+                var existsAny = true;
                 //var existsAny = _fcsContext.ContractAllocations
                 //    .Any(ca => ca.DeliveryUKPRN == ukprn && ca.ContractAllocationNumber == contractReference);
                 if (existsAny)
