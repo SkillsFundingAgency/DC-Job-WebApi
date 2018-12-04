@@ -60,13 +60,18 @@ namespace ESFA.DC.Job.WebApi.Ioc
                 .As<DbContextOptions<JobQueueDataContext>>()
                 .SingleInstance();
 
-            //builder.Register(context =>
-            //    {
-            //        var connectionStrings = context.Resolve<ConnectionStrings>();
-            //        return new FcsContext(connectionStrings.FCSReferenceData);
-            //    })
-            //    .As<IFcsContext>()
-            //    .SingleInstance();
+            builder.Register(context =>
+                {
+                    var connectionStrings = context.Resolve<ConnectionStrings>();
+                    var optionsBuilder = new DbContextOptionsBuilder<FcsContext>();
+                    optionsBuilder.UseSqlServer(
+                        connectionStrings.FCSReferenceData,
+                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
+
+                    return new FcsContext(optionsBuilder.Options);
+                })
+                .As<IFcsContext>()
+                .SingleInstance();
         }
     }
 }

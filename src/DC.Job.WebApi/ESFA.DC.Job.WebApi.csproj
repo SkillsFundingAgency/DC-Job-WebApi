@@ -32,12 +32,10 @@
     <PackageReference Include="ESFA.DC.Jobs.Model" Version="0.1.27-beta0001" />
     <PackageReference Include="ESFA.DC.JobStatus" Version="0.1.12-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.1-beta0001" />
-    <PackageReference Include="ESFA.DC.ReferenceData.FCS.Model" Version="0.1.95" />
+    <PackageReference Include="ESFA.DC.ReferenceData.FCS.Model" Version="0.1.98" />
     <PackageReference Include="ESFA.DC.Serialization.Json" Version="0.1.4-beta0001" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.sqlserver" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta007" />
   </ItemGroup>
