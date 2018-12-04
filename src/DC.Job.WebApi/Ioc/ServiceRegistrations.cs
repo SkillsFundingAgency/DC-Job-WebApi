@@ -14,6 +14,8 @@ using ESFA.DC.JobQueueManager.ExternalData;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.JobQueueManager.Interfaces.ExternalData;
 using ESFA.DC.Jobs.Model.Enums;
+using ESFA.DC.ReferenceData.FCS.Model;
+using ESFA.DC.ReferenceData.FCS.Model.Interface;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Json;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +59,14 @@ namespace ESFA.DC.Job.WebApi.Ioc
                 })
                 .As<DbContextOptions<JobQueueDataContext>>()
                 .SingleInstance();
+
+            //builder.Register(context =>
+            //    {
+            //        var connectionStrings = context.Resolve<ConnectionStrings>();
+            //        return new FcsContext(connectionStrings.FCSReferenceData);
+            //    })
+            //    .As<IFcsContext>()
+            //    .SingleInstance();
         }
     }
 }
