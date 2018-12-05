@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
+using ESFA.DC.Data.Organisations.Model;
+using ESFA.DC.Data.Organisations.Model.Interface;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.IO.AzureStorage;
 using ESFA.DC.IO.AzureStorage.Config.Interfaces;
@@ -71,6 +73,19 @@ namespace ESFA.DC.Job.WebApi.Ioc
                     return new FcsContext(optionsBuilder.Options);
                 })
                 .As<IFcsContext>()
+                .SingleInstance();
+
+            builder.Register(context =>
+                {
+                    var connectionStrings = context.Resolve<ConnectionStrings>();
+                    var optionsBuilder = new DbContextOptionsBuilder<OrganisationsContext>();
+                    optionsBuilder.UseSqlServer(
+                        connectionStrings.ORGReferenceData,
+                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
+
+                    return new OrganisationsContext(optionsBuilder.Options);
+                })
+                .As<IOrganisationsContext>()
                 .SingleInstance();
         }
     }
