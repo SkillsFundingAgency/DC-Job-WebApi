@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Autofac.Features.AttributeFilters;
-using Autofac.Features.Indexed;
-using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.IO.Interfaces;
-using ESFA.DC.JobQueueManager.Interfaces;
-using ESFA.DC.Jobs.Model.Enums;
+using ESFA.DC.Data.Organisations.Model.Interface;
 using ESFA.DC.Logging.Interfaces;
 using ESFA.DC.ReferenceData.FCS.Model.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Remotion.Linq.Parsing.ExpressionVisitors.MemberBindings;
 
 namespace ESFA.DC.Job.WebApi.Controllers
 {
@@ -21,13 +13,16 @@ namespace ESFA.DC.Job.WebApi.Controllers
     public class FileValidationController : ControllerBase
     {
         private readonly IFcsContext _fcsContext;
+        private readonly IOrganisationsContext _organisationsContext;
         private readonly ILogger _logger;
 
         public FileValidationController(
             IFcsContext fcsContext,
+            IOrganisationsContext organisationsContext,
             ILogger logger)
         {
             _fcsContext = fcsContext;
+            _organisationsContext = organisationsContext;
             _logger = logger;
         }
 
@@ -44,9 +39,8 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             try
             {
-                var existsAny = true;
-                //var existsAny = _fcsContext.ContractAllocations
-                //    .Any(ca => ca.DeliveryUKPRN == ukprn && ca.ContractAllocationNumber == contractReference);
+                var existsAny = _organisationsContext.MasterOrganisations
+                    .Any(ca => ca.Ukprn == ukprn);
                 if (existsAny)
                 {
                     return Ok();
