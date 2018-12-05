@@ -70,7 +70,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             try
             {
                 var existsAny = _fcsContext.ContractAllocation
-                    .Any(ca => ca.DeliveryUkprn == ukprn && ca.ContractAllocationNumber == contractReference);
+                    .Any(x => x.ContractAllocationNumber == contractReference && x.Contract.Contractor.Ukprn == ukprn);
                 if (existsAny)
                 {
                     return Ok();
