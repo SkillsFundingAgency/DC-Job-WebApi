@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ESFA.DC.CollectionsManagement.Models;
 using ESFA.DC.JobQueueManager.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,13 @@ namespace ESFA.DC.Job.WebApi.Controllers
         public async Task<ReturnPeriod> GetNext(string collectionName)
         {
             return await _retrunCalendarService.GetNextPeriodAsync(collectionName);
+        }
+
+        // GET api/values/5
+        [HttpGet("{collectionName}/dateTimeUtc")]
+        public async Task<ReturnPeriod> GetPeriod(string collectionName, DateTime dateTimeUtc)
+        {
+            return await _retrunCalendarService.GetPeriodAsync(collectionName, dateTimeUtc);
         }
     }
 }
