@@ -31,10 +31,17 @@ namespace ESFA.DC.Job.WebApi.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{collectionName}/dateTimeUtc")]
+        [HttpGet("{collectionName}/{dateTimeUtc}")]
         public async Task<ReturnPeriod> GetPeriod(string collectionName, DateTime dateTimeUtc)
         {
             return await _retrunCalendarService.GetPeriodAsync(collectionName, dateTimeUtc);
+        }
+
+        // GET api/values/5
+        [HttpGet("{collectionName}/previous/{dateTimeUtc}")]
+        public async Task<ReturnPeriod> GetPreviousPeriod(string collectionName, DateTime dateTimeUtc)
+        {
+            return await _retrunCalendarService.GetPreviousPeriodAsync(collectionName, dateTimeUtc);
         }
     }
 }
