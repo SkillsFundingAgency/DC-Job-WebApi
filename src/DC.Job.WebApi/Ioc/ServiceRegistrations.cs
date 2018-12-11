@@ -36,6 +36,7 @@ namespace ESFA.DC.Job.WebApi.Ioc
             builder.RegisterType<EmailTemplateManager>().As<IEmailTemplateManager>().InstancePerLifetimeScope();
             builder.RegisterType<ReturnCalendarService>().As<IReturnCalendarService>().InstancePerLifetimeScope();
             builder.RegisterType<OrganisationService>().As<IOrganisationService>().InstancePerLifetimeScope();
+            builder.RegisterType<CollectionService>().As<ICollectionService>().InstancePerLifetimeScope();
 
             builder.Register(context =>
             {
