@@ -124,7 +124,7 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
-        [HttpGet("latest/{ukprn}/{startDateTimeUtc}/{endDateTimeUtc}")]
+        [HttpGet("{ukprn}/{startDateTimeUtc}/{endDateTimeUtc}/latest-for-period")]
         public IActionResult GetLatestPerPeriodForUkprn(long ukprn, DateTime startDateTimeUtc, DateTime endDateTimeUtc)
         {
             _logger.LogInfo($"Request received to GetLatestPerPeriodForUkprn with ukprn: {ukprn}, start date :{startDateTimeUtc}, end date : {endDateTimeUtc}");
