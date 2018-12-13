@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
+using ESFA.DC.Data.Organisations.Model;
+using ESFA.DC.Data.Organisations.Model.Interface;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.IO.AzureStorage;
 using ESFA.DC.IO.AzureStorage.Config.Interfaces;
@@ -14,6 +16,8 @@ using ESFA.DC.JobQueueManager.ExternalData;
 using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.JobQueueManager.Interfaces.ExternalData;
 using ESFA.DC.Jobs.Model.Enums;
+using ESFA.DC.ReferenceData.FCS.Model;
+using ESFA.DC.ReferenceData.FCS.Model.Interface;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Json;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +36,7 @@ namespace ESFA.DC.Job.WebApi.Ioc
             builder.RegisterType<EmailTemplateManager>().As<IEmailTemplateManager>().InstancePerLifetimeScope();
             builder.RegisterType<ReturnCalendarService>().As<IReturnCalendarService>().InstancePerLifetimeScope();
             builder.RegisterType<OrganisationService>().As<IOrganisationService>().InstancePerLifetimeScope();
+            builder.RegisterType<CollectionService>().As<ICollectionService>().InstancePerLifetimeScope();
 
             builder.Register(context =>
             {
@@ -56,6 +61,32 @@ namespace ESFA.DC.Job.WebApi.Ioc
                     return optionsBuilder.Options;
                 })
                 .As<DbContextOptions<JobQueueDataContext>>()
+                .SingleInstance();
+
+            builder.Register(context =>
+                {
+                    var connectionStrings = context.Resolve<ConnectionStrings>();
+                    var optionsBuilder = new DbContextOptionsBuilder<FcsContext>();
+                    optionsBuilder.UseSqlServer(
+                        connectionStrings.FCSReferenceData,
+                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
+
+                    return new FcsContext(optionsBuilder.Options);
+                })
+                .As<IFcsContext>()
+                .SingleInstance();
+
+            builder.Register(context =>
+                {
+                    var connectionStrings = context.Resolve<ConnectionStrings>();
+                    var optionsBuilder = new DbContextOptionsBuilder<OrganisationsContext>();
+                    optionsBuilder.UseSqlServer(
+                        connectionStrings.ORGReferenceData,
+                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
+
+                    return new OrganisationsContext(optionsBuilder.Options);
+                })
+                .As<IOrganisationsContext>()
                 .SingleInstance();
         }
     }

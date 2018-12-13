@@ -124,6 +124,23 @@ namespace ESFA.DC.Job.WebApi.Controllers
             return Ok(jobsList);
         }
 
+        [HttpGet("{ukprn}/{startDateTimeUtc}/{endDateTimeUtc}/latest-for-period")]
+        public IActionResult GetLatestPerPeriodForUkprn(long ukprn, DateTime startDateTimeUtc, DateTime endDateTimeUtc)
+        {
+            _logger.LogInfo($"Request received to GetLatestPerPeriodForUkprn with ukprn: {ukprn}, start date :{startDateTimeUtc}, end date : {endDateTimeUtc}");
+
+            if (ukprn == 0)
+            {
+                _logger.LogWarning("Request received with ukprn 0");
+                return BadRequest();
+            }
+
+            var jobsList = _fileUploadJobManager.GetLatestJobsPerPeriodByUkprn(ukprn, startDateTimeUtc, endDateTimeUtc).OrderByDescending(x => x.DateTimeSubmittedUtc).ToList();
+
+            _logger.LogInfo($"Returning {jobsList.Count} jobs successfully for ukprn: {ukprn}");
+            return Ok(jobsList);
+        }
+
         [HttpGet("{ukprn}/period/{period}")]
         public IActionResult GetForPeriod(long ukprn, int period)
         {
@@ -155,6 +172,23 @@ namespace ESFA.DC.Job.WebApi.Controllers
             var job = _fileUploadJobManager.GetLatestJobByUkprn(ukprn, collectionName);
 
             _logger.LogInfo($"Returning job successfully for ukprn :{ukprn}");
+            return Ok(job);
+        }
+
+        [HttpGet("{ukprn}/{contractReference}/{collectionName}/latest")]
+        public IActionResult GetLatestJob(long ukprn, string contractReference, string collectionName)
+        {
+            _logger.LogInfo($"Request received to get the with ukprn: {ukprn}, contract reference: {contractReference}, collection name :{collectionName}");
+
+            if (ukprn == 0 || string.IsNullOrEmpty(collectionName) || string.IsNullOrEmpty(contractReference))
+            {
+                _logger.LogWarning($"Request received with ukprn {ukprn}, contract reference: {contractReference}, collection name :{collectionName}, returning bad request");
+                return BadRequest();
+            }
+
+            var job = _fileUploadJobManager.GetLatestJobByUkprnAndContractReference(ukprn, contractReference, collectionName);
+
+            _logger.LogInfo($"Returning job successfully for ukprn :{ukprn}, contract reference: {contractReference}, collection name :{collectionName}");
             return Ok(job);
         }
 
