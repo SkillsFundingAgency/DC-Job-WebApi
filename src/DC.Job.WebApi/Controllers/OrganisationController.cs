@@ -83,20 +83,20 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
             if (orgsList.Any())
             {
-                //get all the last jobs for providers
                 var ukprns = orgsList.Select(x => x.Ukprn).ToArray();
 
+                //get all the last jobs for providers
                 var lastJobs = _fileUploadMetaDataManager.GetLatestJobByUkprn(ukprns).ToList();
 
                 foreach (var org in orgsList)
                 {
-                    var job = lastJobs.SingleOrDefault(x => x.Ukprn == org.Ukprn);
-
                     var provider = new ProviderDetail()
                     {
                         Ukprn = org.Ukprn,
                         Name = org.Name,
                     };
+
+                    var job = lastJobs.SingleOrDefault(x => x.Ukprn == org.Ukprn);
 
                     if (job != null)
                     {
