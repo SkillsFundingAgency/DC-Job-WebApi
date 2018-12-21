@@ -11,7 +11,6 @@ using ESFA.DC.Jobs.Model.Enums;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Remotion.Linq.Parsing.ExpressionVisitors.MemberBindings;
 
 namespace ESFA.DC.Job.WebApi.Controllers
 {
