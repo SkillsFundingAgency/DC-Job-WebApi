@@ -7,6 +7,7 @@ using ESFA.DC.CollectionsManagement.Models;
 using ESFA.DC.Data.Organisations.Model;
 using ESFA.DC.Data.Organisations.Model.Interface;
 using ESFA.DC.JobQueueManager.Interfaces;
+using ESFA.DC.ReferenceData.FCS.Model.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,15 +19,18 @@ namespace ESFA.DC.Job.WebApi.Controllers
         private readonly IOrganisationService _organisationService;
         private readonly IOrganisationsContext _organisationsContext;
         private readonly IFileUploadJobManager _fileUploadMetaDataManager;
+        private readonly IFcsContext _fcsContext;
 
         public OrganisationController(
             IOrganisationService organisationService,
             IOrganisationsContext organisationsContext,
-            IFileUploadJobManager fileUploadMetaDataManager)
+            IFileUploadJobManager fileUploadMetaDataManager,
+            IFcsContext fcsContext)
         {
             _organisationService = organisationService;
             _organisationsContext = organisationsContext;
             _fileUploadMetaDataManager = fileUploadMetaDataManager;
+            _fcsContext = fcsContext;
         }
 
         // GET api/values/5
@@ -62,6 +66,18 @@ namespace ESFA.DC.Job.WebApi.Controllers
             }
 
             return await _organisationsContext.MasterOrganisations.FirstOrDefaultAsync(x => x.Ukprn == ukprn);
+        }
+
+        // GET api/values/5
+        [HttpGet("esf/contracts/{ukprn}")]
+        public async Task<int> GetEsfContracts(long ukprn)
+        {
+            if (ukprn == 0)
+            {
+                return 0;
+            }
+
+            return await _fcsContext.ContractAllocation.CountAsync(x => x.Contract.Contractor.Ukprn == ukprn);
         }
 
         // GET api/values/5
