@@ -58,14 +58,26 @@ namespace ESFA.DC.Job.WebApi.Controllers
 
         // GET api/values/5
         [HttpGet("{ukprn}")]
-        public async Task<MasterOrganisations> GetProvider(long ukprn)
+        public async Task<ProviderDetail> GetProvider(long ukprn)
         {
             if (ukprn == 0)
             {
                 return null;
             }
 
-            return await _organisationsContext.MasterOrganisations.FirstOrDefaultAsync(x => x.Ukprn == ukprn);
+            var data = await _organisationsContext.MasterOrganisations.Include(x => x.OrgDetails).FirstOrDefaultAsync(x => x.Ukprn == ukprn);
+
+            if (data != null)
+            {
+                var provider = new ProviderDetail()
+                {
+                    Ukprn = data.Ukprn,
+                    Name = data.OrgDetails.Name,
+                };
+                return provider;
+            }
+
+            return null;
         }
 
         // GET api/values/5
