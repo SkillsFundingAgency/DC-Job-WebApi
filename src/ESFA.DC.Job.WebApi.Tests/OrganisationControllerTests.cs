@@ -20,7 +20,7 @@ namespace ESFA.DC.Job.WebApi.Tests
         [Fact]
         public void GetSearchResults_NullSearchTerm()
         {
-            var orgController = new OrganisationController(null, null, null);
+            var orgController = new OrganisationController(null, null, null, null);
             orgController.SearchProviders(null).Result.Should().BeNull();
         }
 
@@ -33,7 +33,7 @@ namespace ESFA.DC.Job.WebApi.Tests
             fileUploadManagerMock.Setup(x => x.GetLatestJobByUkprn(It.IsAny<long[]>()))
                 .Returns(new List<FileUploadJob>());
 
-            var orgController = new OrganisationController(orgnisationServiceMock.Object, GetContext(), fileUploadManagerMock.Object);
+            var orgController = new OrganisationController(orgnisationServiceMock.Object, GetContext(), fileUploadManagerMock.Object, null);
             var result = orgController.SearchProviders("Org").Result;
             result.Count().Should().Be(3);
         }
@@ -56,7 +56,7 @@ namespace ESFA.DC.Job.WebApi.Tests
                     }
                 });
 
-            var orgController = new OrganisationController(orgnisationServiceMock.Object, GetContext(), fileUploadManagerMock.Object);
+            var orgController = new OrganisationController(orgnisationServiceMock.Object, GetContext(), fileUploadManagerMock.Object, null);
             var result = orgController.SearchProviders("1000").Result;
             result.Count().Should().Be(1);
             result.Any(x =>
